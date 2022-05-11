@@ -1,0 +1,45 @@
+{
+  "name": "apple-interaction-clone-with-fp",
+  "version": "0.0.1",
+  "description": "🍎 Apple website interaction clone coding with functional programming 🍎",
+  "scripts": {
+    "prepare": "husky install",
+    "clean": "rm -rf dist",
+    "lint": "eslint . --ext .ts,.tsx",
+    "pretty": "prettier --write \"./**/*.{ts,js,json}\"",
+    "check-types": "tsc --noEmit --skipLibCheck",
+    "lint-staged": "lint-staged",
+    "copy-html": "cp src/index.html dist",
+    "start": "yarn copy-html && esbuild src/index.ts --bundle --outfile=dist/index.js --servedir=dist",
+    "build": "esbuild src/index.ts --bundle --minify --sourcemap=external --outfile=dist/index.js && yarn copy-html",
+    "dev": "yarn start",
+    "develop": "yarn start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alstn2468/apple-interaction-clone-with-fp.git"
+  },
+  "keywords": [
+    "apple",
+    "interaction",
+    "fp",
+    "functional programming"
+  ],
+  "author": "Minsu Kim <alstn2468_@naver.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/alstn2468/apple-interaction-clone-with-fp/issues"
+  },
+  "homepage": "https://github.com/alstn2468/apple-interaction-clone-with-fp#readme",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.23.0",
+    "@typescript-eslint/parser": "^5.23.0",
+    "esbuild": "^0.14.38",
+    "eslint": "^8.15.0",
+    "eslint-config-prettier": "^8.5.0",
+    "husky": "^8.0.1",
+    "lint-staged": "^12.4.1",
+    "prettier": "^2.6.2",
+    "typescript": "^4.6.4"
+  }
+}
