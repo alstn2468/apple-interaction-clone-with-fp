@@ -11,6 +11,7 @@
     "lint-staged": "lint-staged",
     "copy-html": "cp src/index.html dist",
     "start": "yarn copy-html && esbuild src/index.ts --bundle --outfile=dist/index.js --servedir=dist",
+    "watch": "yarn copy-html && esbuild src/index.ts --bundle --outfile=dist/index.js --watch",
     "build": "esbuild src/index.ts --bundle --minify --sourcemap=external --outfile=dist/index.js && yarn copy-html",
     "dev": "yarn start",
     "develop": "yarn start"

@@ -1,0 +1,40 @@
+@charset 'utf-8';
+
+.global-nav {
+  height: 44px;
+}
+
+.local-nav {
+  height: 52px;
+  border-bottom: 1px solid #DDDDDD;
+}
+
+.global-nav-links,
+.local-nav-links {
+  display: flex;
+  align-items: center;
+
+  height: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.global-nav-links {
+  justify-content: space-between;
+}
+
+.product-name {
+  margin-right: auto;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.right-local-nav-links {
+  display: flex;
+  align-items: center;
+}
+
+.right-local-nav-links a {
+  margin-left: 2em;
+  font-size: 0.8em;
+}
