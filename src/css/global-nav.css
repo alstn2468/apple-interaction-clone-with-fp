@@ -2,11 +2,13 @@
 
 .global-nav {
   height: 44px;
+  padding: 0 1rem;
 }
 
 .local-nav {
   height: 52px;
   border-bottom: 1px solid #DDDDDD;
+  padding: 0 1rem;
 }
 
 .global-nav-links,
