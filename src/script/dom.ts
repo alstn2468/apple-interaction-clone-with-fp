@@ -10,19 +10,19 @@ const querySelector = (selector: string) =>
     pipe(document.querySelector(selector), O.fromNullable);
 
 const addClassName = (className: string) =>
-  (element: HTMLElement) =>
+  (element: Element) =>
     (element.classList.add(className), element);
 
 const removeClassName = (className: string) =>
-  (element: HTMLElement) =>
+  (element: Element) =>
     (element.classList.remove(className), element);
 
 const setAttribute = (attribute: string, value: string) =>
-  (element: HTMLElement) =>
+  (element: Element) =>
     (element.setAttribute(attribute, value), element);
 
 const removeChild = (child: Node) =>
-  (element: HTMLElement) =>
+  (element: Element) =>
     (element.removeChild(child), element);
 
 const addClassNameToBody = (className: string) =>
