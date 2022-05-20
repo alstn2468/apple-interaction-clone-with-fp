@@ -1,12 +1,13 @@
+import * as O from 'fp-ts/lib/Option';
 import { pipe } from 'fp-ts/lib/function';
 
 const getElementById = (id: string) =>
   (document: Document) =>
-    [document, document.getElementById(id)] as const;
+    pipe(document.getElementById(id), O.fromNullable);
 
 const querySelector = (selector: string) =>
   (document: Document) =>
-    [document, document.querySelector(selector)] as const;
+    pipe(document.querySelector(selector), O.fromNullable);
 
 const addClassName = (className: string) =>
   (element: HTMLElement) =>
@@ -52,13 +53,21 @@ const removeChildToBody = (child: Node) =>
       removeChild(child),
     );
 
-const addEventListener = <K extends keyof WindowEventMap>(
+const addWindowEventListener = <K extends keyof WindowEventMap>(
   type: K,
   listener: (this: Window, ev: WindowEventMap[K]) => unknown,
   options?: boolean | AddEventListenerOptions | undefined,
 ) =>
   (window: Window) =>
     (window.addEventListener(type, listener, options), window);
+
+const addElementEventListener = <K extends keyof HTMLElementEventMap>(
+  type: K,
+  listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => unknown,
+  options?: boolean | AddEventListenerOptions | undefined,
+) =>
+  (element: HTMLElement) =>
+    (element.addEventListener(type, listener, options), element);
 
 export {
   getElementById,
@@ -71,5 +80,6 @@ export {
   removeClassNameToBody,
   setAttributeToBody,
   removeChildToBody,
-  addEventListener,
+  addWindowEventListener,
+  addElementEventListener,
 };
