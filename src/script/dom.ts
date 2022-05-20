@@ -21,6 +21,10 @@ const setAttribute = (attribute: string, value: string) =>
   (element: Element) =>
     (element.setAttribute(attribute, value), element);
 
+const setElementStyle = (property: string, value: string) =>
+  (element: HTMLElement) =>
+    element.style.setProperty(property, value);
+
 const removeChild = (child: Node) =>
   (element: Element) =>
     (element.removeChild(child), element);
@@ -53,14 +57,6 @@ const removeChildToBody = (child: Node) =>
       removeChild(child),
     );
 
-const addWindowEventListener = <K extends keyof WindowEventMap>(
-  type: K,
-  listener: (this: Window, ev: WindowEventMap[K]) => unknown,
-  options?: boolean | AddEventListenerOptions | undefined,
-) =>
-  (window: Window) =>
-    (window.addEventListener(type, listener, options), window);
-
 const addElementEventListener = <K extends keyof HTMLElementEventMap>(
   type: K,
   listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => unknown,
@@ -76,10 +72,10 @@ export {
   removeClassName,
   setAttribute,
   removeChild,
+  setElementStyle,
   addClassNameToBody,
   removeClassNameToBody,
   setAttributeToBody,
   removeChildToBody,
-  addWindowEventListener,
   addElementEventListener,
 };
