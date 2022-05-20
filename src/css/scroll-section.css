@@ -77,6 +77,21 @@
   color: #888888;
 }
 
+.sticky-element {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+#show-scroll-section-0 #scroll-sction-0 .sticky-element,
+#show-scroll-section-1 #scroll-sction-1 .sticky-element,
+#show-scroll-section-2 #scroll-sction-2 .sticky-element,
+#show-scroll-section-3 #scroll-sction-3 .sticky-element {
+  display: block;
+}
+
 @media (min-width: 1024px) {
   #scroll-section-0 h1 {
     font-size: 9vw;
