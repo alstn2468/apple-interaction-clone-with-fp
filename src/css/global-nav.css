@@ -1,11 +1,22 @@
 @charset 'utf-8';
 
+.global-nav,
+.local-nav {
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
+
 .global-nav {
+  top: 0;
+
   height: 44px;
   padding: 0 1rem;
 }
 
 .local-nav {
+  top: 45px;
+
   height: 52px;
   border-bottom: 1px solid #DDDDDD;
   padding: 0 1rem;
