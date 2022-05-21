@@ -85,10 +85,10 @@
   width: 100%;
 }
 
-#show-scroll-section-0 #scroll-sction-0 .sticky-element,
-#show-scroll-section-1 #scroll-sction-1 .sticky-element,
-#show-scroll-section-2 #scroll-sction-2 .sticky-element,
-#show-scroll-section-3 #scroll-sction-3 .sticky-element {
+#show-scroll-section-0 #scroll-section-0 .sticky-element,
+#show-scroll-section-1 #scroll-section-1 .sticky-element,
+#show-scroll-section-2 #scroll-section-2 .sticky-element,
+#show-scroll-section-3 #scroll-section-3 .sticky-element {
   display: block;
 }
 
