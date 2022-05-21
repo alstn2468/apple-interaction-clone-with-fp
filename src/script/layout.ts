@@ -1,10 +1,14 @@
-import * as N from 'fp-ts/lib/number';
 import * as A from 'fp-ts/lib/Array';
 import * as O from 'fp-ts/lib/Option';
 import { pipe, flow } from 'fp-ts/lib/function';
 
-import { type ScrollInfo, getScrollInfoValue, setScrollInfoValue } from './scrollInfo';
+import { getNewCurrentSceneOnLoad } from './scroll';
 import { getElementById, setElementStyle } from './dom';
+import {
+  type ScrollInfo,
+  getScrollInfoValue,
+  setScrollInfoValue,
+} from './scrollInfo';
 
 const getScrollSectionId = (index: number) => `scroll-section-${index}`;
 
@@ -13,6 +17,13 @@ const getScrollSectionElement = (document: Document) =>
     pipe(
       document,
       getElementById(getScrollSectionId(index)),
+    );
+
+const getScrollSectionElements = (document: Document) =>
+  (scrollInfoArray: ScrollInfo[]) =>
+    pipe(
+      scrollInfoArray,
+      A.mapWithIndex(getScrollSectionElement(document)),
     );
 
 const setContainerObject = (document: Document) =>
@@ -28,7 +39,7 @@ const setContainerObject = (document: Document) =>
 
 const getScrollHeight = (innerHeight: number) =>
   (heightMultiple: number) =>
-    N.MonoidProduct.concat(innerHeight, heightMultiple);
+    innerHeight * heightMultiple;
 
 const setScrollHeight = (innerHeight: number) =>
   (scrollInfo: ScrollInfo) =>
@@ -39,6 +50,12 @@ const setScrollHeight = (innerHeight: number) =>
       setScrollInfoValue('scrollHeight', scrollInfo),
     );
 
+const getCalculatedScrollInfo = (innerHeight: number) =>
+  (scrollInfoArray: ScrollInfo[]) => pipe(
+    scrollInfoArray,
+    A.map(setScrollHeight(innerHeight)),
+  );
+
 const setElementScrollHeight = (scrollInfo: ScrollInfo) =>
   pipe(
     scrollInfo.objs.container,
@@ -46,16 +63,18 @@ const setElementScrollHeight = (scrollInfo: ScrollInfo) =>
     () => scrollInfo,
   );
 
-const setLayout = (document: Document) =>
-  (scrollInfoArray: ScrollInfo[]) =>
-    (innerHeight: number) =>
-      pipe(
-        scrollInfoArray,
-        A.map(setScrollHeight(innerHeight)),
-        A.mapWithIndex(setContainerObject(document)),
-        A.map(setElementScrollHeight),
-      );
+const setLayout = (window: Window, scrollInfoArray: ScrollInfo[]) =>
+  (innerHeight: number) =>
+    pipe(
+      scrollInfoArray,
+      getCalculatedScrollInfo(innerHeight),
+      A.mapWithIndex(setContainerObject(window.document)),
+      A.map(setElementScrollHeight),
+      getNewCurrentSceneOnLoad(window),
+    );
 
 export {
+  getCalculatedScrollInfo,
+  getScrollSectionElements,
   setLayout,
 };
