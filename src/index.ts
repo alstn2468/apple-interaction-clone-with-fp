@@ -4,19 +4,22 @@ import './css/footer.css';
 import './css/global-nav.css';
 import './css/scroll-section.css';
 import { setLayout } from './script/layout';
-import { scrollInfoArray } from './script/scrollInfo';
+import { scrollInfoArray, getCalculatedScrollInfo } from './script/scrollInfo';
 import {
   getNewCurrentScene,
   setShowScrolElementToBody,
 } from './script/scroll';
 
-const setLayoutByInnerHeight = setLayout(window, scrollInfoArray);
-const getNewCurrentSceneByCurrentScene = getNewCurrentScene(window, scrollInfoArray);
+const getCalculatedScrollInfoByInnerHeight = getCalculatedScrollInfo(scrollInfoArray);
+const getNewCurrentSceneByCurrentScene = getNewCurrentScene(
+  window,
+  getCalculatedScrollInfoByInnerHeight(window.innerHeight),
+);
 const setShowScrolElementToBodyByCurrentScene = setShowScrolElementToBody(document);
 
 window.addEventListener(
   'resize',
-  () => setLayoutByInnerHeight(window.innerHeight),
+  () => setLayout(window, getCalculatedScrollInfoByInnerHeight(window.innerHeight)),
 );
 
 (() => {
@@ -32,7 +35,10 @@ window.addEventListener(
   window.addEventListener(
     'load',
     () => {
-      currentScene = setLayoutByInnerHeight(window.innerHeight);
+      currentScene = setLayout(
+        window,
+        getCalculatedScrollInfoByInnerHeight(window.innerHeight),
+      );
       setShowScrolElementToBodyByCurrentScene(currentScene);
     },
   );

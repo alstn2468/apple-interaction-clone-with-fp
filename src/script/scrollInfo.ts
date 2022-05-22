@@ -1,3 +1,5 @@
+import { pipe } from 'fp-ts/lib/function';
+import * as A from 'fp-ts/lib/Array';
 import * as O from 'fp-ts/lib/Option';
 
 type ScrollType = 'sticky' | 'normal';
@@ -56,9 +58,30 @@ const getScrollInfoValue = <T extends keyof ScrollInfo>(key: T) =>
   (scrollInfo: ScrollInfo) =>
     scrollInfo[key];
 
+const getScrollHeight = (innerHeight: number) =>
+  (heightMultiple: number) =>
+    innerHeight * heightMultiple;
+
+const setScrollHeight = (innerHeight: number) =>
+  (scrollInfo: ScrollInfo) =>
+    pipe(
+      scrollInfo,
+      getScrollInfoValue('heightMultiple'),
+      getScrollHeight(innerHeight),
+      setScrollInfoValue('scrollHeight', scrollInfo),
+    );
+
+const getCalculatedScrollInfo = (scrollInfoArray: ScrollInfo[]) =>
+  (innerHeight: number) =>
+    pipe(
+      scrollInfoArray,
+      A.map(setScrollHeight(innerHeight)),
+    );
+
 export {
   type ScrollInfo,
   scrollInfoArray,
   setScrollInfoValue,
   getScrollInfoValue,
+  getCalculatedScrollInfo,
 };
