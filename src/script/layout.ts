@@ -2,7 +2,6 @@ import * as A from 'fp-ts/lib/Array';
 import * as O from 'fp-ts/lib/Option';
 import { pipe, flow } from 'fp-ts/lib/function';
 
-import { getNewCurrentSceneOnLoad } from './scroll';
 import { getElementById, setElementStyle } from './dom';
 import {
   type ScrollInfo,
