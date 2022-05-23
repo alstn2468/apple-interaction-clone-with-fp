@@ -48,7 +48,6 @@ const setLayout = (window: Window, scrollInfoArray: ScrollInfo[]) =>
     scrollInfoArray,
     A.mapWithIndex(setContainerObject(window.document)),
     A.map(setElementScrollHeight),
-    getNewCurrentSceneOnLoad(window),
   );
 
 export {

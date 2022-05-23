@@ -7,15 +7,14 @@ import { setLayout } from './script/layout';
 import { scrollInfoArray, getCalculatedScrollInfo } from './script/scrollInfo';
 import {
   getNewCurrentScene,
+  getNewCurrentSceneOnLoad,
   setShowScrolElementToBody,
 } from './script/scroll';
 
 const getCalculatedScrollInfoByInnerHeight = getCalculatedScrollInfo(scrollInfoArray);
-const getNewCurrentSceneByCurrentScene = getNewCurrentScene(
-  window,
-  getCalculatedScrollInfoByInnerHeight(window.innerHeight),
-);
 const setShowScrolElementToBodyByCurrentScene = setShowScrolElementToBody(document);
+
+const initalCalcuatedScrollInfo = getCalculatedScrollInfoByInnerHeight(window.innerHeight);
 
 window.addEventListener(
   'resize',
@@ -28,18 +27,23 @@ window.addEventListener(
   window.addEventListener(
     'scroll',
     () => {
-      currentScene = getNewCurrentSceneByCurrentScene(currentScene);
+      currentScene = getNewCurrentScene(
+        window.scrollY,
+        currentScene,
+        initalCalcuatedScrollInfo,
+      );
       setShowScrolElementToBodyByCurrentScene(currentScene);
     },
   )
   window.addEventListener(
     'load',
     () => {
-      currentScene = setLayout(
-        window,
-        getCalculatedScrollInfoByInnerHeight(window.innerHeight),
-      );
+      currentScene = getNewCurrentSceneOnLoad(window.scrollY, initalCalcuatedScrollInfo);
       setShowScrolElementToBodyByCurrentScene(currentScene);
+      setLayout(
+        window,
+        initalCalcuatedScrollInfo,
+      );
     },
   );
 })();
