@@ -18,7 +18,7 @@ const initalCalcuatedScrollInfo = getCalculatedScrollInfoByInnerHeight(window.in
 
 window.addEventListener(
   'resize',
-  () => setLayout(window, getCalculatedScrollInfoByInnerHeight(window.innerHeight)),
+  () => setLayout(document, getCalculatedScrollInfoByInnerHeight(window.innerHeight)),
 );
 
 (() => {
@@ -41,7 +41,7 @@ window.addEventListener(
       currentScene = getNewCurrentSceneOnLoad(window.scrollY, initalCalcuatedScrollInfo);
       setShowScrolElementToBodyByCurrentScene(currentScene);
       setLayout(
-        window,
+        document,
         initalCalcuatedScrollInfo,
       );
     },

@@ -43,10 +43,10 @@ const setElementScrollHeight = (scrollInfo: ScrollInfo) =>
     () => scrollInfo,
   );
 
-const setLayout = (window: Window, scrollInfoArray: ScrollInfo[]) =>
+const setLayout = (document: Document, scrollInfoArray: ScrollInfo[]) =>
   pipe(
     scrollInfoArray,
-    A.mapWithIndex(setContainerObject(window.document)),
+    A.mapWithIndex(setContainerObject(document)),
     A.map(setElementScrollHeight),
   );
 
