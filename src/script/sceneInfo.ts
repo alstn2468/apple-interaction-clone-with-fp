@@ -2,18 +2,18 @@ import { pipe } from 'fp-ts/lib/function';
 import * as A from 'fp-ts/lib/Array';
 import * as O from 'fp-ts/lib/Option';
 
-type ScrollType = 'sticky' | 'normal';
-type ScrollInfo = {
+type SceneType = 'sticky' | 'normal';
+type SceneInfo = {
   // 브라우저 높이의 배수
   heightMultiple: number,
   scrollHeight: number,
-  type: ScrollType,
+  type: SceneType,
   objs: {
     container: O.Option<HTMLElement>,
   },
 };
 
-const scrollInfoArray: ScrollInfo[] = [
+const sceneInfoArray: SceneInfo[] = [
   { /* #scroll-section-0 */
     type: 'sticky',
     heightMultiple: 5,
@@ -48,40 +48,40 @@ const scrollInfoArray: ScrollInfo[] = [
   },
 ];
 
-const setScrollInfoValue = <
-  T extends keyof ScrollInfo
->(key: T, scrollInfo: ScrollInfo) =>
-  (value: ScrollInfo[T]) =>
-    ({ ...scrollInfo, [key]: value });
+const setSceneInfoValue = <
+  T extends keyof SceneInfo
+>(key: T, sceneInfo: SceneInfo) =>
+  (value: SceneInfo[T]) =>
+    ({ ...sceneInfo, [key]: value });
 
-const getScrollInfoValue = <T extends keyof ScrollInfo>(key: T) =>
-  (scrollInfo: ScrollInfo) =>
-    scrollInfo[key];
+const getSceneInfoValue = <T extends keyof SceneInfo>(key: T) =>
+  (sceneInfo: SceneInfo) =>
+    sceneInfo[key];
 
 const getScrollHeight = (innerHeight: number) =>
   (heightMultiple: number) =>
     innerHeight * heightMultiple;
 
 const setScrollHeight = (innerHeight: number) =>
-  (scrollInfo: ScrollInfo) =>
+  (sceneInfo: SceneInfo) =>
     pipe(
-      scrollInfo,
-      getScrollInfoValue('heightMultiple'),
+      sceneInfo,
+      getSceneInfoValue('heightMultiple'),
       getScrollHeight(innerHeight),
-      setScrollInfoValue('scrollHeight', scrollInfo),
+      setSceneInfoValue('scrollHeight', sceneInfo),
     );
 
-const getCalculatedScrollInfo = (scrollInfoArray: ScrollInfo[]) =>
+const getCalculatedSceneInfo = (sceneInfoArray: SceneInfo[]) =>
   (innerHeight: number) =>
     pipe(
-      scrollInfoArray,
+      sceneInfoArray,
       A.map(setScrollHeight(innerHeight)),
     );
 
 export {
-  type ScrollInfo,
-  scrollInfoArray,
-  setScrollInfoValue,
-  getScrollInfoValue,
-  getCalculatedScrollInfo,
+  type SceneInfo,
+  sceneInfoArray,
+  setSceneInfoValue,
+  getSceneInfoValue,
+  getCalculatedSceneInfo,
 };

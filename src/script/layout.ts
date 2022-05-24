@@ -4,9 +4,9 @@ import { pipe, flow } from 'fp-ts/lib/function';
 
 import { getElementById, setElementStyle } from './dom';
 import {
-  type ScrollInfo,
-  setScrollInfoValue,
-} from './scrollInfo';
+  type SceneInfo,
+  setSceneInfoValue,
+} from './sceneInfo';
 
 const getScrollSectionId = (index: number) => `scroll-section-${index}`;
 
@@ -18,33 +18,33 @@ const getScrollSectionElement = (document: Document) =>
     );
 
 const getScrollSectionElements = (document: Document) =>
-  (scrollInfoArray: ScrollInfo[]) =>
+  (sceneInfoArray: SceneInfo[]) =>
     pipe(
-      scrollInfoArray,
+      sceneInfoArray,
       A.mapWithIndex(getScrollSectionElement(document)),
     );
 
 const setContainerObject = (document: Document) =>
-  (index: number, scrollInfo: ScrollInfo) =>
+  (index: number, sceneInfo: SceneInfo) =>
     pipe(
       index,
       getScrollSectionElement(document),
       flow(
-        (element) => ({ ...scrollInfo.objs, container: element }),
-        setScrollInfoValue('objs', scrollInfo),
+        (element) => ({ ...sceneInfo.objs, container: element }),
+        setSceneInfoValue('objs', sceneInfo),
       ),
     );
 
-const setElementScrollHeight = (scrollInfo: ScrollInfo) =>
+const setElementScrollHeight = (sceneInfo: SceneInfo) =>
   pipe(
-    scrollInfo.objs.container,
-    O.map(setElementStyle('height', `${scrollInfo.scrollHeight}px`)),
-    () => scrollInfo,
+    sceneInfo.objs.container,
+    O.map(setElementStyle('height', `${sceneInfo.scrollHeight}px`)),
+    () => sceneInfo,
   );
 
-const setLayout = (document: Document, scrollInfoArray: ScrollInfo[]) =>
+const setLayout = (document: Document, sceneInfoArray: SceneInfo[]) =>
   pipe(
-    scrollInfoArray,
+    sceneInfoArray,
     A.mapWithIndex(setContainerObject(document)),
     A.map(setElementScrollHeight),
   );

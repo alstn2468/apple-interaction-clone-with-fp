@@ -2,31 +2,31 @@ import * as A from 'fp-ts/lib/Array';
 import { pipe } from 'fp-ts/lib/function';
 
 import { setAttributeToBody } from './dom';
-import { type ScrollInfo } from './scrollInfo';
+import { type SceneInfo } from './sceneInfo';
 
 const getScrollHeightValue = (
   currentScene: number,
-  scrollInfoArray: ScrollInfo[],
+  sceneInfoArray: SceneInfo[],
 ): [number, number] => {
   const prevScrollHeight = pipe(
-    scrollInfoArray,
+    sceneInfoArray,
     A.filterWithIndex((index) => index < currentScene),
     A.reduce(0, (b, a) => b + a.scrollHeight),
   );
 
-  return [prevScrollHeight, scrollInfoArray[currentScene].scrollHeight];
+  return [prevScrollHeight, sceneInfoArray[currentScene].scrollHeight];
 };
 
 const getNewCurrentScene = (
   scrollY: number,
   currentScene: number,
-  scrollInfoArray: ScrollInfo[],
+  sceneInfoArray: SceneInfo[],
 ) => {
   let newCurrentScene = currentScene;
 
   const [prevScrollHeight, currentSceneScrollHeight] = getScrollHeightValue(
     currentScene,
-    scrollInfoArray,
+    sceneInfoArray,
   );
 
   if (scrollY < prevScrollHeight
@@ -35,18 +35,18 @@ const getNewCurrentScene = (
   }
 
   if (scrollY > prevScrollHeight + currentSceneScrollHeight
-    && currentScene < scrollInfoArray.length) {
+    && currentScene < sceneInfoArray.length) {
     newCurrentScene += 1;
   }
 
   return newCurrentScene;
 };
 
-const getNewCurrentSceneOnLoad = (scrollY: number, scrollInfoArray: ScrollInfo[]) => {
+const getNewCurrentSceneOnLoad = (scrollY: number, sceneInfoArray: SceneInfo[]) => {
   let totalScrollHeight = 0;
 
-  for (const [index, scrollInfo] of scrollInfoArray.entries()) {
-    totalScrollHeight += scrollInfo.scrollHeight;
+  for (const [index, sceneInfo] of sceneInfoArray.entries()) {
+    totalScrollHeight += sceneInfo.scrollHeight;
 
     if (totalScrollHeight >= scrollY) {
       return index;
