@@ -52,7 +52,7 @@ const getCalculatedCSSValue = (
           return end;
         }
       }
-      return getValueByRatio(Math.min(currentSceneScrollY / currentSceneScrollHeight, 1));
+      return getValueByRatio(currentSceneScrollY / currentSceneScrollHeight);
     },
   ),
 );
