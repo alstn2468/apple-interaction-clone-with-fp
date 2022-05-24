@@ -1,6 +1,6 @@
 import * as A from 'fp-ts/lib/Array';
 import * as O from 'fp-ts/lib/Option';
-import { pipe, flow } from 'fp-ts/lib/function';
+import { pipe } from 'fp-ts/lib/function';
 
 import { getElementById, setElementStyle } from './dom';
 import {
@@ -24,13 +24,24 @@ const getScrollSectionElements = (document: Document) =>
       A.mapWithIndex(getScrollSectionElement(document)),
     );
 
-const setContainerObject = (document: Document) =>
+const setSceneInfoElementObject = (document: Document) =>
   (index: number, sceneInfo: SceneInfo) =>
     pipe(
       index,
       getScrollSectionElement(document),
-      flow(
-        (element) => ({ ...sceneInfo.objs, container: element }),
+      (element) => pipe(
+        element,
+        O.chain((element) =>
+          O.some(element.querySelectorAll('.sticky-element') as NodeListOf<HTMLElement>)
+        ),
+        O.chain((messages) => O.some({
+          ...sceneInfo.objs,
+          container: element,
+          messages: Array.from(messages),
+        })),
+      ),
+      O.match(
+        () => sceneInfo,
         setSceneInfoValue('objs', sceneInfo),
       ),
     );
@@ -42,14 +53,14 @@ const setElementScrollHeight = (sceneInfo: SceneInfo) =>
     () => sceneInfo,
   );
 
-const setLayout = (document: Document, sceneInfoArray: SceneInfo[]) =>
+const setLayout = (sceneInfoArray: SceneInfo[]) =>
   pipe(
     sceneInfoArray,
-    A.mapWithIndex(setContainerObject(document)),
     A.map(setElementScrollHeight),
   );
 
 export {
   getScrollSectionElements,
+  setSceneInfoElementObject,
   setLayout,
 };

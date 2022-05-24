@@ -1,6 +1,8 @@
 import { pipe } from 'fp-ts/lib/function';
+import type { Animation } from './animation';
 import * as A from 'fp-ts/lib/Array';
 import * as O from 'fp-ts/lib/Option';
+import { setSceneInfoElementObject } from './layout';
 
 type SceneType = 'sticky' | 'normal';
 type SceneInfo = {
@@ -10,7 +12,9 @@ type SceneInfo = {
   type: SceneType,
   objs: {
     container: O.Option<HTMLElement>,
+    messages: Array<HTMLElement>,
   },
+  animations: Array<Animation>,
 };
 
 const sceneInfoArray: SceneInfo[] = [
@@ -20,7 +24,16 @@ const sceneInfoArray: SceneInfo[] = [
     scrollHeight: 0,
     objs: {
       container: O.none,
+      messages: [],
     },
+    animations: [
+      { /* #scroll-section-0 .main-message:nth-child(0) */
+        opacity: { start: 0, end: 1, timing: { start: 0.1, end: 0.2 } },
+      },
+      { /* #scroll-section-0 .main-message:nth-child(1) */
+        opacity: { start: 0, end: 1, timing: { start: 0.3, end: 0.4 } },
+      },
+    ],
   },
   { /* #scroll-section-1 */
     type: 'normal',
@@ -28,7 +41,9 @@ const sceneInfoArray: SceneInfo[] = [
     scrollHeight: 0,
     objs: {
       container: O.none,
+      messages: [],
     },
+    animations: [{}],
   },
   { /* #scroll-section-2 */
     type: 'sticky',
@@ -36,7 +51,9 @@ const sceneInfoArray: SceneInfo[] = [
     scrollHeight: 0,
     objs: {
       container: O.none,
+      messages: [],
     },
+    animations: [{}],
   },
   { /* #scroll-section-3 */
     type: 'sticky',
@@ -44,7 +61,9 @@ const sceneInfoArray: SceneInfo[] = [
     scrollHeight: 0,
     objs: {
       container: O.none,
+      messages: [],
     },
+    animations: [{}],
   },
 ];
 
@@ -72,10 +91,11 @@ const setScrollHeight = (innerHeight: number) =>
     );
 
 const getCalculatedSceneInfo = (sceneInfoArray: SceneInfo[]) =>
-  (innerHeight: number) =>
+  (window: Window) =>
     pipe(
       sceneInfoArray,
-      A.map(setScrollHeight(innerHeight)),
+      A.map(setScrollHeight(window.innerHeight)),
+      A.mapWithIndex(setSceneInfoElementObject(window.document)),
     );
 
 export {

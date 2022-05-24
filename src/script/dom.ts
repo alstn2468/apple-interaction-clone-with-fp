@@ -7,7 +7,7 @@ const getElementById = (id: string) =>
 
 const querySelector = (selector: string) =>
   (document: Document) =>
-    pipe(document.querySelector(selector), O.fromNullable);
+    pipe(document.querySelector(selector) as HTMLElement | null, O.fromNullable);
 
 const addClassName = (className: string) =>
   (element: Element) =>

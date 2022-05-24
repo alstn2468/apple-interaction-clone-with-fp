@@ -13,6 +13,7 @@
   justify-content: center;
   height: 3em;
   font-size: 2.5rem;
+  opacity: 0;
 }
 
 .main-message p {

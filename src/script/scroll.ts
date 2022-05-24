@@ -39,7 +39,7 @@ const getNewCurrentScene = (
     newCurrentScene += 1;
   }
 
-  return newCurrentScene;
+  return [newCurrentScene, scrollY - prevScrollHeight] as const;
 };
 
 const getNewCurrentSceneOnLoad = (scrollY: number, sceneInfoArray: SceneInfo[]) => {
