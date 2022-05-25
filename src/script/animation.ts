@@ -1,7 +1,7 @@
 import type * as CSS from 'csstype';
 import * as A from 'fp-ts/lib/Array';
 import * as O from 'fp-ts/lib/Option';
-import { pipe, flow } from 'fp-ts/lib/function';
+import { pipe, constVoid } from 'fp-ts/lib/function';
 
 import { SceneInfo } from './sceneInfo';
 import { setElementStyle } from './dom';
@@ -57,31 +57,59 @@ const getCalculatedCSSValue = (
   ),
 );
 
-const playAnimation = (sceneInfoArray: SceneInfo[]) =>
-  (currentScene: number, currentSceneScrollY: number) => {
-    const currentSceneInfo = sceneInfoArray[currentScene];
+const getCalculatedAnimationObjects = (
+  currentSceneScrollHeight: number,
+  currentSceneScrollY: number,
+) => (animation: Animation) =>
+  pipe(
+    Object.entries(animation),
+    A.map(([key, value]) => ({
+      key,
+      value: getCalculatedCSSValue(
+        value,
+        currentSceneScrollHeight,
+        currentSceneScrollY
+      ),
+      timing: value?.timing,
+    })),
+  );
 
-    if (!currentSceneInfo) {
-      return;
-    }
-
-    const { objs: { messages }, animations, scrollHeight } = currentSceneInfo;
-
-    const calculatedAnimationValues = pipe(
-      animations,
-      A.map(
-        flow(
-          (animations) => Object.entries(animations),
-          A.map(([key, value]) => ({
-            key,
-            value: getCalculatedCSSValue(value, scrollHeight, currentSceneScrollY),
-            timing: value?.timing,
-          })),
+type AnimationObjects = ReturnType<ReturnType<typeof getCalculatedAnimationObjects>>;
+const applyAnimationObjectStyleToElement = (element: HTMLElement) =>
+  (animationObjects: AnimationObjects) =>
+    pipe(
+      animationObjects,
+      A.map(({ key, value }) =>
+        pipe(
+          value,
+          O.match(
+            () => constVoid,
+            (cssValue) => setElementStyle(key, cssValue.toString()),
+          ),
+          (setStyle) => setStyle(element),
         ),
       ),
-      console.log,
     );
-  };
+
+const playAnimation = (sceneInfoArray: SceneInfo[]) =>
+  (currentScene: number, currentSceneScrollY: number) =>
+    pipe(
+      sceneInfoArray[currentScene],
+      O.fromNullable,
+      O.match(
+        constVoid,
+        ({ objs: { messages }, animations, scrollHeight }) =>
+          pipe(
+            animations,
+            A.map(getCalculatedAnimationObjects(scrollHeight, currentSceneScrollY)),
+            A.zip(messages),
+            A.map(([animationObjects, element]) => pipe(
+              animationObjects,
+              applyAnimationObjectStyleToElement(element),
+            )),
+          ),
+      ),
+    );
 
 export {
   type Animation,
