@@ -49,7 +49,7 @@ window.addEventListener(
   window.addEventListener(
     'scroll',
     () => {
-      const [newCurrentScene, currentScrollY] = getNewCurrentScene(
+      const [newCurrentScene, prevScrollHeight] = getNewCurrentScene(
         window.scrollY,
         currentScene,
         initalCalcuatedSceneInfo,
@@ -58,7 +58,11 @@ window.addEventListener(
       setShowScrolElementToBodyByCurrentScene(newCurrentScene);
 
       if (currentScene === newCurrentScene) {
-        playAnimationWithCalculatedSceneInfo(newCurrentScene, currentScrollY);
+        playAnimationWithCalculatedSceneInfo(
+          newCurrentScene,
+          prevScrollHeight,
+          window.scrollY,
+        );
       }
 
       currentScene = newCurrentScene;

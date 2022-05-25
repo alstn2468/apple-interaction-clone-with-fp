@@ -6,14 +6,20 @@ import { pipe, constVoid } from 'fp-ts/lib/function';
 import { SceneInfo } from './sceneInfo';
 import { setElementStyle } from './dom';
 
-type CSSValue = number | string;
+type CSSValue = number;
 type AnimationValue = {
   start: CSSValue,
   end: CSSValue,
-  timing?: { start: number, end: number },
+};
+type AnimationValueWithTiming = {
+  start: CSSValue,
+  end: CSSValue,
+  timing: { start: number, end: number },
 };
 type Animation = {
-  [key in keyof CSS.Properties]?: AnimationValue;
+  [key in keyof CSS.Properties]?:
+    | { in: AnimationValueWithTiming, out: AnimationValueWithTiming }
+    | AnimationValue;
 };
 
 const getValue = (start: CSSValue, end: CSSValue) =>
@@ -25,7 +31,7 @@ const getValue = (start: CSSValue, end: CSSValue) =>
   }
 
 const getCalculatedCSSValue = (
-  value: Animation[keyof CSS.Properties],
+  value: AnimationValue | AnimationValueWithTiming,
   currentSceneScrollHeight: number,
   currentSceneScrollY: number,
 ) => pipe(
@@ -33,9 +39,11 @@ const getCalculatedCSSValue = (
   O.fromNullable,
   O.match(
     () => O.none,
-    ({ start, end, timing }) => {
+    (value) => {
+      const { start, end } = value;
       const getValueByRatio = getValue(start, end);
-      if (timing) {
+      if ('timing' in value) {
+        const { timing } = value;
         const startHeight = timing.start * currentSceneScrollHeight;
         const endHeight = timing.end * currentSceneScrollHeight;
 
@@ -57,22 +65,59 @@ const getCalculatedCSSValue = (
   ),
 );
 
-const getCalculatedAnimationObjects = (
+type InOutAnimationEntry = [
+  string,
+  Exclude<Animation[keyof CSS.Properties], undefined>
+];
+const getInOrOutAnimation = (scrollRatio: number) =>
+  ([key, value]: InOutAnimationEntry)  => {
+    if ('in' in value && 'out' in value) {
+      return pipe(
+        (value.in.timing.end + value.out.timing.start) / 2,
+        O.fromPredicate((median) => scrollRatio <= median),
+        O.match(
+          () => [key, value.out] as const,
+          () => [key, value.in] as const,
+        ),
+      );
+    }
+
+    return [key, value] as const;
+  }
+
+type AnimationEntry = ReturnType<ReturnType<typeof getInOrOutAnimation>>
+const getCalculatedAnimationObject = (
   currentSceneScrollHeight: number,
   currentSceneScrollY: number,
-) => (animation: Animation) =>
-  pipe(
-    Object.entries(animation),
-    A.map(([key, value]) => ({
+) => ([key, value]: AnimationEntry) => {
+    return ({
       key,
       value: getCalculatedCSSValue(
         value,
         currentSceneScrollHeight,
-        currentSceneScrollY
+        currentSceneScrollY,
       ),
-      timing: value?.timing,
-    })),
+    });
+  }
+
+const getCalculatedAnimationObjects = (
+  currentSceneScrollHeight: number,
+  prevScrollHeight: number,
+  scrollY: number,
+) => (animation: Animation) => {
+  const currentSceneScrollY = scrollY - prevScrollHeight;
+  const scrollRatio = (scrollY - prevScrollHeight) / currentSceneScrollHeight;
+  return pipe(
+    Object.entries(animation),
+    A.map(
+      (animationEntry) => pipe(
+        animationEntry,
+        getInOrOutAnimation(scrollRatio),
+        getCalculatedAnimationObject(currentSceneScrollHeight, currentSceneScrollY),
+      ),
+    ),
   );
+}
 
 type AnimationObjects = ReturnType<ReturnType<typeof getCalculatedAnimationObjects>>;
 const applyAnimationObjectStyleToElement = (element: HTMLElement) =>
@@ -92,7 +137,7 @@ const applyAnimationObjectStyleToElement = (element: HTMLElement) =>
     );
 
 const playAnimation = (sceneInfoArray: SceneInfo[]) =>
-  (currentScene: number, currentSceneScrollY: number) =>
+  (currentScene: number, prevScrollHeight: number, scrollY: number) =>
     pipe(
       sceneInfoArray[currentScene],
       O.fromNullable,
@@ -101,7 +146,7 @@ const playAnimation = (sceneInfoArray: SceneInfo[]) =>
         ({ objs: { messages }, animations, scrollHeight }) =>
           pipe(
             animations,
-            A.map(getCalculatedAnimationObjects(scrollHeight, currentSceneScrollY)),
+            A.map(getCalculatedAnimationObjects(scrollHeight, prevScrollHeight, scrollY)),
             A.zip(messages),
             A.map(([animationObjects, element]) => pipe(
               animationObjects,
@@ -114,4 +159,4 @@ const playAnimation = (sceneInfoArray: SceneInfo[]) =>
 export {
   type Animation,
   playAnimation,
-}
+};

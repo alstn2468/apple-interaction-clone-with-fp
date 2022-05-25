@@ -28,10 +28,16 @@ const sceneInfoArray: SceneInfo[] = [
     },
     animations: [
       { /* #scroll-section-0 .main-message:nth-child(0) */
-        opacity: { start: 0, end: 1, timing: { start: 0.1, end: 0.2 } },
+        opacity: {
+          in: { start: 0, end: 1, timing: { start: 0.1, end: 0.2 } },
+          out: { start: 1, end: 0, timing: { start: 0.25, end: 0.3 } },
+        },
       },
       { /* #scroll-section-0 .main-message:nth-child(1) */
-        opacity: { start: 0, end: 1, timing: { start: 0.3, end: 0.4 } },
+        opacity: {
+          in: { start: 0, end: 1, timing: { start: 0.3, end: 0.4 } },
+          out: { start: 1, end: 0, timing: { start: 0.45, end: 0.5 } },
+        },
       },
     ],
   },

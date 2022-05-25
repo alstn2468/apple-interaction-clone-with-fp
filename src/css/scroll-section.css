@@ -13,6 +13,7 @@
   justify-content: center;
   height: 3em;
   font-size: 2.5rem;
+  top: 35vh;
   opacity: 0;
 }
 
@@ -81,7 +82,6 @@
 .sticky-element {
   display: none;
   position: fixed;
-  top: 0;
   left: 0;
   width: 100%;
 }
