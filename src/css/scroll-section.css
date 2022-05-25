@@ -48,6 +48,16 @@
   font-size: 1.2rem;
 }
 
+#scroll-section-2 .description-message:nth-child(2) {
+  top: 10%;
+  left: 40%;
+}
+
+#scroll-section-2 .description-message:nth-child(3) {
+  top: 15%;
+  left: 45%;
+}
+
 .description-message {
   width: 50%;
   font-weight: bold;
@@ -116,6 +126,15 @@
 
   #scroll-section-2 .main-message small {
     font-size: 1.5vw;
+  }
+
+  #scroll-section-2 .description-message:nth-child(2) {
+    top: 20%;
+    left: 40%;
+  }
+
+  #scroll-section-2 .description-message:nth-child(3) {
+    left: 55%;
   }
 
   .description-message {
