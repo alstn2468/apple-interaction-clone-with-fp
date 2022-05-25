@@ -1,7 +1,7 @@
 import type * as CSS from 'csstype';
 import * as A from 'fp-ts/lib/Array';
 import * as O from 'fp-ts/lib/Option';
-import { pipe } from 'fp-ts/lib/function';
+import { pipe, flow } from 'fp-ts/lib/function';
 
 import { SceneInfo } from './sceneInfo';
 import { setElementStyle } from './dom';
@@ -69,13 +69,15 @@ const playAnimation = (sceneInfoArray: SceneInfo[]) =>
 
     const calculatedAnimationValues = pipe(
       animations,
-      A.map((animation) => Object.entries(animation)),
       A.map(
-        A.map(([key, value]) => ({
-          key,
-          value: getCalculatedCSSValue(value, scrollHeight, currentSceneScrollY),
-          timing: value.timing,
-        })),
+        flow(
+          (animations) => Object.entries(animations),
+          A.map(([key, value]) => ({
+            key,
+            value: getCalculatedCSSValue(value, scrollHeight, currentSceneScrollY),
+            timing: value?.timing,
+          })),
+        ),
       ),
       console.log,
     );
