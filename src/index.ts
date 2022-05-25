@@ -13,51 +13,47 @@ import {
   setShowScrolElementToBody,
 } from './script/scroll';
 
-const getCalculatedSceneInfoByInnerHeight = getCalculatedSceneInfo(sceneInfoArray);
-const setShowScrolElementToBodyByCurrentScene = setShowScrolElementToBody(document);
+const getCalculatedSceneInfoByInnerHeight =
+  getCalculatedSceneInfo(sceneInfoArray);
+const setShowScrolElementToBodyByCurrentScene =
+  setShowScrolElementToBody(document);
 
-window.addEventListener(
-  'resize',
-  () => setLayout(getCalculatedSceneInfoByInnerHeight(window)),
+window.addEventListener('resize', () =>
+  setLayout(getCalculatedSceneInfoByInnerHeight(window)),
 );
 
 (() => {
   let currentScene = 0;
-  window.addEventListener(
-    'load',
-    () => {
-      const calculatedSceneInfo = getCalculatedSceneInfoByInnerHeight(window);
-      const newCurrentScene = getNewCurrentSceneOnLoad(
+  window.addEventListener('load', () => {
+    const calculatedSceneInfo = getCalculatedSceneInfoByInnerHeight(window);
+    const newCurrentScene = getNewCurrentSceneOnLoad(
+      window.scrollY,
+      calculatedSceneInfo,
+    );
+
+    setShowScrolElementToBodyByCurrentScene(newCurrentScene);
+    setLayout(calculatedSceneInfo);
+
+    currentScene = newCurrentScene;
+  });
+  window.addEventListener('scroll', () => {
+    const calculatedSceneInfo = getCalculatedSceneInfoByInnerHeight(window);
+    const [newCurrentScene, prevScrollHeight] = getNewCurrentScene(
+      window.scrollY,
+      currentScene,
+      calculatedSceneInfo,
+    );
+
+    setShowScrolElementToBodyByCurrentScene(newCurrentScene);
+
+    if (currentScene === newCurrentScene) {
+      playAnimation(calculatedSceneInfo)(
+        newCurrentScene,
+        prevScrollHeight,
         window.scrollY,
-        calculatedSceneInfo,
       );
+    }
 
-      setShowScrolElementToBodyByCurrentScene(newCurrentScene);
-      setLayout(calculatedSceneInfo);
-
-      currentScene = newCurrentScene;
-    },
-  );
-  window.addEventListener(
-    'scroll',
-    () => {
-      const calculatedSceneInfo = getCalculatedSceneInfoByInnerHeight(window);
-      const [newCurrentScene, prevScrollHeight] = getNewCurrentScene(
-        window.scrollY,
-        currentScene,
-        calculatedSceneInfo,
-      );
-
-      setShowScrolElementToBodyByCurrentScene(newCurrentScene);
-
-      if (currentScene === newCurrentScene) {
-        playAnimation
-          (calculatedSceneInfo)
-          (newCurrentScene, prevScrollHeight, window.scrollY);
-      }
-
-      currentScene = newCurrentScene;
-    },
-  );
+    currentScene = newCurrentScene;
+  });
 })();
-

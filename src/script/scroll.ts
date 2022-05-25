@@ -29,20 +29,24 @@ const getNewCurrentScene = (
     sceneInfoArray,
   );
 
-  if (scrollY < prevScrollHeight
-    && newCurrentScene !== 0) {
+  if (scrollY < prevScrollHeight && newCurrentScene !== 0) {
     newCurrentScene -= 1;
   }
 
-  if (scrollY > prevScrollHeight + currentSceneScrollHeight
-    && currentScene < sceneInfoArray.length) {
+  if (
+    scrollY > prevScrollHeight + currentSceneScrollHeight &&
+    currentScene < sceneInfoArray.length
+  ) {
     newCurrentScene += 1;
   }
 
   return [newCurrentScene, prevScrollHeight] as const;
 };
 
-const getNewCurrentSceneOnLoad = (scrollY: number, sceneInfoArray: SceneInfo[]) => {
+const getNewCurrentSceneOnLoad = (
+  scrollY: number,
+  sceneInfoArray: SceneInfo[],
+) => {
   let totalScrollHeight = 0;
 
   for (const [index, sceneInfo] of sceneInfoArray.entries()) {
@@ -54,13 +58,13 @@ const getNewCurrentSceneOnLoad = (scrollY: number, sceneInfoArray: SceneInfo[]) 
   }
 
   return 0;
-}
+};
 
 const getShowScrollElementId = (currentScene: number) =>
   `show-scroll-section-${currentScene}`;
 
-const setShowScrolElementToBody = (document: Document) =>
-  (currentScene: number) =>
+const setShowScrolElementToBody =
+  (document: Document) => (currentScene: number) =>
     pipe(
       document,
       setAttributeToBody('id', getShowScrollElementId(currentScene)),

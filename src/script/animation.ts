@@ -8,71 +8,74 @@ import { setElementStyle } from './dom';
 
 type CSSValue = number;
 type AnimationValue = {
-  start: CSSValue,
-  end: CSSValue,
-  template?: string,
+  start: CSSValue;
+  end: CSSValue;
+  template?: string;
 };
 type AnimationValueWithTiming = {
-  start: CSSValue,
-  end: CSSValue,
-  template?: string,
-  timing: { start: number, end: number },
+  start: CSSValue;
+  end: CSSValue;
+  template?: string;
+  timing: { start: number; end: number };
 };
 type Animation = {
   [key in keyof CSS.Properties]?:
-    | { in: AnimationValueWithTiming, out: AnimationValueWithTiming }
+    | { in: AnimationValueWithTiming; out: AnimationValueWithTiming }
     | AnimationValue;
 };
 
-const getValue = (start: CSSValue, end: CSSValue) =>
-  (ratio: number) => {
-    if (typeof start === 'number' && typeof end === 'number') {
-      return O.some((end - start) * ratio + start);
-    }
-    return O.none;
+const getValue = (start: CSSValue, end: CSSValue) => (ratio: number) => {
+  if (typeof start === 'number' && typeof end === 'number') {
+    return O.some((end - start) * ratio + start);
   }
+  return O.none;
+};
 
 const getCalculatedCSSValue = (
   value: AnimationValue | AnimationValueWithTiming,
   currentSceneScrollHeight: number,
   currentSceneScrollY: number,
-) => pipe(
-  value,
-  O.fromNullable,
-  O.match(
-    () => O.none,
-    (value) => {
-      const { start, end } = value;
-      const getValueByRatio = getValue(start, end);
-      if ('timing' in value) {
-        const { timing } = value;
-        const startHeight = timing.start * currentSceneScrollHeight;
-        const endHeight = timing.end * currentSceneScrollHeight;
+) =>
+  pipe(
+    value,
+    O.fromNullable,
+    O.match(
+      () => O.none,
+      (value) => {
+        const { start, end } = value;
+        const getValueByRatio = getValue(start, end);
+        if ('timing' in value) {
+          const { timing } = value;
+          const startHeight = timing.start * currentSceneScrollHeight;
+          const endHeight = timing.end * currentSceneScrollHeight;
 
-        if (startHeight <= currentSceneScrollY
-          && currentSceneScrollY <= endHeight) {
-          return getValueByRatio(
-            (currentSceneScrollY - startHeight) / (endHeight - startHeight)
-          );
+          if (
+            startHeight <= currentSceneScrollY &&
+            currentSceneScrollY <= endHeight
+          ) {
+            return getValueByRatio(
+              (currentSceneScrollY - startHeight) / (endHeight - startHeight),
+            );
+          }
+          if (currentSceneScrollY < startHeight) {
+            return O.some(start);
+          }
+          if (currentSceneScrollY > endHeight) {
+            return O.some(end);
+          }
         }
-        if (currentSceneScrollY < startHeight) {
-          return O.some(start);
-        }
-        if (currentSceneScrollY > endHeight) {
-          return O.some(end);
-        }
-      }
-      return getValueByRatio(currentSceneScrollY / currentSceneScrollHeight);
-    },
-  ),
-);
+        return getValueByRatio(currentSceneScrollY / currentSceneScrollHeight);
+      },
+    ),
+  );
 
 type InOutAnimationEntry = [
   string,
-  Exclude<Animation[keyof CSS.Properties], undefined>
+  Exclude<Animation[keyof CSS.Properties], undefined>,
 ];
-const getInOrOutAnimation = (scrollRatio: number) =>
-  ([key, value]: InOutAnimationEntry)  => {
+const getInOrOutAnimation =
+  (scrollRatio: number) =>
+  ([key, value]: InOutAnimationEntry) => {
     if ('in' in value && 'out' in value) {
       return pipe(
         (value.in.timing.end + value.out.timing.start) / 2,
@@ -85,14 +88,13 @@ const getInOrOutAnimation = (scrollRatio: number) =>
     }
 
     return [key, value] as const;
-  }
+  };
 
-type AnimationEntry = ReturnType<ReturnType<typeof getInOrOutAnimation>>
-const getCalculatedAnimationObject = (
-  currentSceneScrollHeight: number,
-  currentSceneScrollY: number,
-) => ([key, value]: AnimationEntry) => {
-    return ({
+type AnimationEntry = ReturnType<ReturnType<typeof getInOrOutAnimation>>;
+const getCalculatedAnimationObject =
+  (currentSceneScrollHeight: number, currentSceneScrollY: number) =>
+  ([key, value]: AnimationEntry) => {
+    return {
       key,
       template: value.template,
       value: getCalculatedCSSValue(
@@ -100,31 +102,38 @@ const getCalculatedAnimationObject = (
         currentSceneScrollHeight,
         currentSceneScrollY,
       ),
-    });
-  }
+    };
+  };
 
-const getCalculatedAnimationObjects = (
-  currentSceneScrollHeight: number,
-  prevScrollHeight: number,
-  scrollY: number,
-) => (animation: Animation) => {
-  const currentSceneScrollY = scrollY - prevScrollHeight;
-  const scrollRatio = (scrollY - prevScrollHeight) / currentSceneScrollHeight;
-  return pipe(
-    Object.entries(animation),
-    A.map(
-      (animationEntry) => pipe(
-        animationEntry,
-        getInOrOutAnimation(scrollRatio),
-        getCalculatedAnimationObject(currentSceneScrollHeight, currentSceneScrollY),
+const getCalculatedAnimationObjects =
+  (
+    currentSceneScrollHeight: number,
+    prevScrollHeight: number,
+    scrollY: number,
+  ) =>
+  (animation: Animation) => {
+    const currentSceneScrollY = scrollY - prevScrollHeight;
+    const scrollRatio = (scrollY - prevScrollHeight) / currentSceneScrollHeight;
+    return pipe(
+      Object.entries(animation),
+      A.map((animationEntry) =>
+        pipe(
+          animationEntry,
+          getInOrOutAnimation(scrollRatio),
+          getCalculatedAnimationObject(
+            currentSceneScrollHeight,
+            currentSceneScrollY,
+          ),
+        ),
       ),
-    ),
-  );
-}
+    );
+  };
 
-type AnimationObjects = ReturnType<ReturnType<typeof getCalculatedAnimationObjects>>;
-const applyAnimationObjectStyleToElement = (element: HTMLElement) =>
-  (animationObjects: AnimationObjects) =>
+type AnimationObjects = ReturnType<
+  ReturnType<typeof getCalculatedAnimationObjects>
+>;
+const applyAnimationObjectStyleToElement =
+  (element: HTMLElement) => (animationObjects: AnimationObjects) =>
     pipe(
       animationObjects,
       A.map(({ key, value, template }) =>
@@ -139,7 +148,8 @@ const applyAnimationObjectStyleToElement = (element: HTMLElement) =>
       ),
     );
 
-const playAnimation = (sceneInfoArray: SceneInfo[]) =>
+const playAnimation =
+  (sceneInfoArray: SceneInfo[]) =>
   (currentScene: number, prevScrollHeight: number, scrollY: number) =>
     pipe(
       sceneInfoArray[currentScene],
@@ -150,19 +160,24 @@ const playAnimation = (sceneInfoArray: SceneInfo[]) =>
           if (type === 'sticky') {
             pipe(
               animations,
-              A.map(getCalculatedAnimationObjects(scrollHeight, prevScrollHeight, scrollY)),
+              A.map(
+                getCalculatedAnimationObjects(
+                  scrollHeight,
+                  prevScrollHeight,
+                  scrollY,
+                ),
+              ),
               A.zip(messages),
-              A.map(([animationObjects, element]) => pipe(
-                animationObjects,
-                applyAnimationObjectStyleToElement(element),
-              )),
+              A.map(([animationObjects, element]) =>
+                pipe(
+                  animationObjects,
+                  applyAnimationObjectStyleToElement(element),
+                ),
+              ),
             );
           }
         },
       ),
     );
 
-export {
-  type Animation,
-  playAnimation,
-};
+export { type Animation, playAnimation };
