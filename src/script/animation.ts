@@ -10,10 +10,12 @@ type CSSValue = number;
 type AnimationValue = {
   start: CSSValue,
   end: CSSValue,
+  template?: string,
 };
 type AnimationValueWithTiming = {
   start: CSSValue,
   end: CSSValue,
+  template?: string,
   timing: { start: number, end: number },
 };
 type Animation = {
@@ -92,6 +94,7 @@ const getCalculatedAnimationObject = (
 ) => ([key, value]: AnimationEntry) => {
     return ({
       key,
+      template: value.template,
       value: getCalculatedCSSValue(
         value,
         currentSceneScrollHeight,
@@ -124,12 +127,12 @@ const applyAnimationObjectStyleToElement = (element: HTMLElement) =>
   (animationObjects: AnimationObjects) =>
     pipe(
       animationObjects,
-      A.map(({ key, value }) =>
+      A.map(({ key, value, template }) =>
         pipe(
           value,
           O.match(
             () => constVoid,
-            (cssValue) => setElementStyle(key, cssValue.toString()),
+            (cssValue) => setElementStyle(key, cssValue, template),
           ),
           (setStyle) => setStyle(element),
         ),

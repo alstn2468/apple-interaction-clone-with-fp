@@ -32,7 +32,7 @@ const setSceneInfoElementObject = (document: Document) =>
       (element) => pipe(
         element,
         O.chain((element) =>
-          O.some(element.querySelectorAll('.sticky-element') as NodeListOf<HTMLElement>)
+          O.some(element.querySelectorAll('.sticky-element') as NodeListOf<HTMLElement>),
         ),
         O.chain((messages) => O.some({
           ...sceneInfo.objs,
@@ -46,12 +46,29 @@ const setSceneInfoElementObject = (document: Document) =>
       ),
     );
 
-const setElementScrollHeight = (sceneInfo: SceneInfo) =>
-  pipe(
+const getElementScrollHeight = (sceneInfo: SceneInfo) => pipe(
+  sceneInfo,
+  O.fromPredicate((sceneInfo) => sceneInfo.type === 'sticky'),
+  O.match(
+    () => pipe(
+      sceneInfo.objs.container,
+      O.match(
+        () => O.none,
+        (element) => O.some(element.offsetHeight),
+      ),
+    ),
+    () => O.some(sceneInfo.scrollHeight),
+  ),
+);
+
+const setElementScrollHeight = (sceneInfo: SceneInfo) => pipe(
+  sceneInfo,
+  getElementScrollHeight,
+  O.map((height) => pipe(
     sceneInfo.objs.container,
-    O.map(setElementStyle('height', `${sceneInfo.scrollHeight}px`)),
-    () => sceneInfo,
-  );
+    O.map(setElementStyle('height', height, '{value}px'))),
+  ),
+);
 
 const setLayout = (sceneInfoArray: SceneInfo[]) =>
   pipe(

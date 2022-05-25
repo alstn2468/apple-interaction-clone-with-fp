@@ -32,11 +32,79 @@ const sceneInfoArray: SceneInfo[] = [
           in: { start: 0, end: 1, timing: { start: 0.1, end: 0.2 } },
           out: { start: 1, end: 0, timing: { start: 0.25, end: 0.3 } },
         },
+        transform: {
+          in: {
+            start: 20,
+            end: 0,
+            template: 'translateY({value}%)',
+            timing: { start: 0.1, end: 0.2 },
+          },
+          out: {
+            start: 0,
+            end: -20,
+            template: 'translateY({value}%)',
+            timing: { start: 0.25, end: 0.3 },
+          },
+        },
       },
       { /* #scroll-section-0 .main-message:nth-child(1) */
         opacity: {
           in: { start: 0, end: 1, timing: { start: 0.3, end: 0.4 } },
           out: { start: 1, end: 0, timing: { start: 0.45, end: 0.5 } },
+        },
+        transform: {
+          in: {
+            start: 20,
+            end: 0,
+            template: 'translateY({value}%)',
+            timing: { start: 0.3, end: 0.4 },
+          },
+          out: {
+            start: 0,
+            end: -20,
+            template: 'translateY({value}%)',
+            timing: { start: 0.45, end: 0.5 },
+          },
+        },
+      },
+      { /* #scroll-section-0 .main-message:nth-child(2) */
+        opacity: {
+          in: { start: 0, end: 1, timing: { start: 0.5, end: 0.6 } },
+          out: { start: 1, end: 0, timing: { start: 0.65, end: 0.7 } },
+        },
+        transform: {
+          in: {
+            start: 20,
+            end: 0,
+            template: 'translateY({value}%)',
+            timing: { start: 0.5, end: 0.6 },
+          },
+          out: {
+            start: 0,
+            end: -20,
+            template: 'translateY({value}%)',
+            timing: { start: 0.65, end: 0.7 },
+          },
+        },
+      },
+      { /* #scroll-section-0 .main-message:nth-child(3) */
+        opacity: {
+          in: { start: 0, end: 1, timing: { start: 0.7, end: 0.8 } },
+          out: { start: 1, end: 0, timing: { start: 0.85, end: 0.9 } },
+        },
+        transform: {
+          in: {
+            start: 20,
+            end: 0,
+            template: 'translateY({value}%)',
+            timing: { start: 0.7, end: 0.8 },
+          },
+          out: {
+            start: 0,
+            end: -20,
+            template: 'translateY({value}%)',
+            timing: { start: 0.85, end: 0.9 },
+          },
         },
       },
     ],

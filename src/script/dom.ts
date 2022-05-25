@@ -21,9 +21,12 @@ const setAttribute = (attribute: string, value: string) =>
   (element: Element) =>
     (element.setAttribute(attribute, value), element);
 
-const setElementStyle = (property: string, value: string) =>
+const setElementStyle = (property: string, value: number, template?: string) =>
   (element: HTMLElement) =>
-    element.style.setProperty(property, value);
+    element.style.setProperty(
+      property,
+      template ? template.replace('{value}', value.toString()) : value.toString(),
+    );
 
 const removeChild = (child: Node) =>
   (element: Element) =>
