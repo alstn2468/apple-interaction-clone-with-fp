@@ -2,6 +2,13 @@
   padding-top: 50vh;
 }
 
+.sticky-element {
+  display: none;
+  position: fixed;
+  left: 0;
+  width: 100%;
+}
+
 #scroll-section-0 h1 {
   font-size: 4rem;
   text-align: center;
@@ -87,13 +94,6 @@
   padding: 0 1rem;
   font-size: 1.2rem;
   color: #888888;
-}
-
-.sticky-element {
-  display: none;
-  position: fixed;
-  left: 0;
-  width: 100%;
 }
 
 #show-scroll-section-0 #scroll-section-0 .sticky-element,

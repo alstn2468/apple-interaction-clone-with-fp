@@ -146,16 +146,19 @@ const playAnimation = (sceneInfoArray: SceneInfo[]) =>
       O.fromNullable,
       O.match(
         constVoid,
-        ({ objs: { messages }, animations, scrollHeight }) =>
-          pipe(
-            animations,
-            A.map(getCalculatedAnimationObjects(scrollHeight, prevScrollHeight, scrollY)),
-            A.zip(messages),
-            A.map(([animationObjects, element]) => pipe(
-              animationObjects,
-              applyAnimationObjectStyleToElement(element),
-            )),
-          ),
+        ({ objs: { messages }, animations, scrollHeight, type }) => {
+          if (type === 'sticky') {
+            pipe(
+              animations,
+              A.map(getCalculatedAnimationObjects(scrollHeight, prevScrollHeight, scrollY)),
+              A.zip(messages),
+              A.map(([animationObjects, element]) => pipe(
+                animationObjects,
+                applyAnimationObjectStyleToElement(element),
+              )),
+            );
+          }
+        },
       ),
     );
 

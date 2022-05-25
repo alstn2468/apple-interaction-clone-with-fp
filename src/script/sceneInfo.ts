@@ -1,8 +1,5 @@
-import { pipe } from 'fp-ts/lib/function';
 import type { Animation } from './animation';
-import * as A from 'fp-ts/lib/Array';
 import * as O from 'fp-ts/lib/Option';
-import { setSceneInfoElementObject } from './layout';
 
 type SceneType = 'sticky' | 'normal';
 type SceneInfo = {
@@ -10,6 +7,7 @@ type SceneInfo = {
   heightMultiple: number,
   scrollHeight: number,
   type: SceneType,
+  selector: Array<string>,
   objs: {
     container: O.Option<HTMLElement>,
     messages: Array<HTMLElement>,
@@ -22,12 +20,13 @@ const sceneInfoArray: SceneInfo[] = [
     type: 'sticky',
     heightMultiple: 5,
     scrollHeight: 0,
+    selector: ['.sticky-element'],
     objs: {
       container: O.none,
       messages: [],
     },
     animations: [
-      { /* #scroll-section-0 .main-message:nth-child(0) */
+      { /* #scroll-section-0 .sticky-element:nth-child(1) */
         opacity: {
           in: { start: 0, end: 1, timing: { start: 0.1, end: 0.2 } },
           out: { start: 1, end: 0, timing: { start: 0.25, end: 0.3 } },
@@ -47,7 +46,7 @@ const sceneInfoArray: SceneInfo[] = [
           },
         },
       },
-      { /* #scroll-section-0 .main-message:nth-child(1) */
+      { /* #scroll-section-0 .sticky-element:nth-child(2) */
         opacity: {
           in: { start: 0, end: 1, timing: { start: 0.3, end: 0.4 } },
           out: { start: 1, end: 0, timing: { start: 0.45, end: 0.5 } },
@@ -67,7 +66,7 @@ const sceneInfoArray: SceneInfo[] = [
           },
         },
       },
-      { /* #scroll-section-0 .main-message:nth-child(2) */
+      { /* #scroll-section-0 .sticky-element:nth-child(3) */
         opacity: {
           in: { start: 0, end: 1, timing: { start: 0.5, end: 0.6 } },
           out: { start: 1, end: 0, timing: { start: 0.65, end: 0.7 } },
@@ -87,7 +86,7 @@ const sceneInfoArray: SceneInfo[] = [
           },
         },
       },
-      { /* #scroll-section-0 .main-message:nth-child(3) */
+      { /* #scroll-section-0 .sticky-element:nth-child(4) */
         opacity: {
           in: { start: 0, end: 1, timing: { start: 0.7, end: 0.8 } },
           out: { start: 1, end: 0, timing: { start: 0.85, end: 0.9 } },
@@ -113,21 +112,124 @@ const sceneInfoArray: SceneInfo[] = [
     type: 'normal',
     heightMultiple: 5,
     scrollHeight: 0,
+    selector: [],
     objs: {
       container: O.none,
       messages: [],
     },
-    animations: [{}],
+    animations: [],
   },
   { /* #scroll-section-2 */
     type: 'sticky',
     heightMultiple: 5,
     scrollHeight: 0,
+    selector: ['.sticky-element', '.pin'],
     objs: {
       container: O.none,
       messages: [],
     },
-    animations: [{}],
+    animations: [
+      { /* #scroll-section-2 .sticky-element:nth-child(1) */
+        opacity: {
+          in: { start: 0, end: 1, timing: { start: 0.15, end: 0.2 } },
+          out: { start: 1, end: 0, timing: { start: 0.3, end: 0.35 } },
+        },
+        transform: {
+          in: {
+            start: 20,
+            end: 0,
+            template: 'translateY({value}%)',
+            timing: { start: 0.15, end: 0.2 },
+          },
+          out: {
+            start: 0,
+            end: -20,
+            template: 'translateY({value}%)',
+            timing: { start: 0.3, end: 0.35 },
+          },
+        },
+      },
+      { /* #scroll-section-2 .sticky-element:nth-child(2) */
+        opacity: {
+          in: { start: 0, end: 1, timing: { start: 0.5, end: 0.55 } },
+          out: { start: 1, end: 0, timing: { start: 0.58, end: 0.63 } },
+        },
+        transform: {
+          in: {
+            start: 30,
+            end: 0,
+            template: 'translateY({value}%)',
+            timing: { start: 0.5, end: 0.55 },
+          },
+          out: {
+            start: 0,
+            end: -20,
+            template: 'translateY({value}%)',
+            timing: { start: 0.58, end: 0.63 },
+          },
+        },
+      },
+      { /* #scroll-section-2 .sticky-element:nth-child(3) */
+        opacity: {
+          in: { start: 0, end: 1, timing: { start: 0.72, end: 0.77 } },
+          out: { start: 1, end: 0, timing: { start: 0.85, end: 0.9 } },
+        },
+        transform: {
+          in: {
+            start: 30,
+            end: 0,
+            template: 'translateY({value}%)',
+            timing: { start: 0.72, end: 0.77 },
+          },
+          out: {
+            start: 0,
+            end: -20,
+            template: 'translateY({value}%)',
+            timing: { start: 0.85, end: 0.9 },
+          },
+        },
+      },
+      { /* #scroll-section-2 .pin:nth-child(1) */
+        opacity: {
+          in: { start: 0, end: 1, timing: { start: 0.5, end: 0.55 } },
+          out: { start: 1, end: 0, timing: { start: 0.58, end: 0.63 } },
+        },
+        transform: {
+          in: {
+            start: 0.5,
+            end: 1,
+            template: 'scaleY({value})',
+            timing: { start: 0.5, end: 0.55 },
+          },
+          out: {
+            start: 0.5,
+            end: 1,
+            template: 'scaleY({value})',
+            timing: { start: 0.5, end: 0.55 },
+          },
+        },
+      },
+      { /* #scroll-section-2 .pin:nth-child(2) */
+        opacity: {
+          in: { start: 0, end: 1, timing: { start: 0.72, end: 0.77 } },
+          out: { start: 1, end: 0, timing: { start: 0.85, end: 0.9 } },
+        },
+        transform: {
+          in: {
+            start: 0.5,
+            end: 1,
+            template: 'scaleY({value})',
+            timing: { start: 0.72, end: 0.77 },
+          },
+          out: {
+            start: 0.5,
+            end: 1,
+            template: 'scaleY({value})',
+            timing: { start: 0.72, end: 0.77 },
+          },
+        },
+      },
+    ],
   },
   { /* #scroll-section-3 */
     type: 'sticky',
@@ -137,45 +239,21 @@ const sceneInfoArray: SceneInfo[] = [
       container: O.none,
       messages: [],
     },
-    animations: [{}],
+    selector: ['.canvas-caption'],
+    animations: [
+      { /* #scroll-section-2 .canvas-caption:nth-child(1) */
+        opacity: { start: 0, end: 1 },
+        transform: {
+          start: 20,
+          end: 0,
+          template: 'translateY({value}%)',
+        },
+      },
+    ],
   },
 ];
-
-const setSceneInfoValue = <
-  T extends keyof SceneInfo
->(key: T, sceneInfo: SceneInfo) =>
-  (value: SceneInfo[T]) =>
-    ({ ...sceneInfo, [key]: value });
-
-const getSceneInfoValue = <T extends keyof SceneInfo>(key: T) =>
-  (sceneInfo: SceneInfo) =>
-    sceneInfo[key];
-
-const getScrollHeight = (innerHeight: number) =>
-  (heightMultiple: number) =>
-    innerHeight * heightMultiple;
-
-const setScrollHeight = (innerHeight: number) =>
-  (sceneInfo: SceneInfo) =>
-    pipe(
-      sceneInfo,
-      getSceneInfoValue('heightMultiple'),
-      getScrollHeight(innerHeight),
-      setSceneInfoValue('scrollHeight', sceneInfo),
-    );
-
-const getCalculatedSceneInfo = (sceneInfoArray: SceneInfo[]) =>
-  (window: Window) =>
-    pipe(
-      sceneInfoArray,
-      A.map(setScrollHeight(window.innerHeight)),
-      A.mapWithIndex(setSceneInfoElementObject(window.document)),
-    );
 
 export {
   type SceneInfo,
   sceneInfoArray,
-  setSceneInfoValue,
-  getSceneInfoValue,
-  getCalculatedSceneInfo,
 };

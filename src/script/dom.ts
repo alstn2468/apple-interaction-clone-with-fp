@@ -9,6 +9,10 @@ const querySelector = (selector: string) =>
   (document: Document) =>
     pipe(document.querySelector(selector) as HTMLElement | null, O.fromNullable);
 
+const querySelectorAll = (element: HTMLElement) =>
+  (selector: string) =>
+    Array.from(element.querySelectorAll(selector)) as HTMLElement[];
+
 const addClassName = (className: string) =>
   (element: Element) =>
     (element.classList.add(className), element);
@@ -71,6 +75,7 @@ const addElementEventListener = <K extends keyof HTMLElementEventMap>(
 export {
   getElementById,
   querySelector,
+  querySelectorAll,
   addClassName,
   removeClassName,
   setAttribute,

@@ -1,5 +1,3 @@
-import { pipe } from 'fp-ts/lib/function';
-
 import './css/reset.css';
 import './css/style.css';
 import './css/footer.css';
@@ -7,7 +5,8 @@ import './css/global-nav.css';
 import './css/scroll-section.css';
 import { setLayout } from './script/layout';
 import { playAnimation } from './script/animation';
-import { sceneInfoArray, getCalculatedSceneInfo } from './script/sceneInfo';
+import { sceneInfoArray } from './script/sceneInfo';
+import { getCalculatedSceneInfo } from './script/scene';
 import {
   getNewCurrentScene,
   getNewCurrentSceneOnLoad,
@@ -15,33 +14,26 @@ import {
 } from './script/scroll';
 
 const getCalculatedSceneInfoByInnerHeight = getCalculatedSceneInfo(sceneInfoArray);
-
-const initalCalcuatedSceneInfo = getCalculatedSceneInfoByInnerHeight(window);
-
 const setShowScrolElementToBodyByCurrentScene = setShowScrolElementToBody(document);
-const playAnimationWithCalculatedSceneInfo = playAnimation(initalCalcuatedSceneInfo);
 
 window.addEventListener(
   'resize',
-  () => pipe(
-    getCalculatedSceneInfoByInnerHeight(window),
-    setLayout,
-  ),
+  () => setLayout(getCalculatedSceneInfoByInnerHeight(window)),
 );
 
 (() => {
-  // TODO: 클로저를 이용하지 않는 더 좋은 방법이 없을까?
-  let currentScene = 0; // Using Closure with IIFE
+  let currentScene = 0;
   window.addEventListener(
     'load',
     () => {
+      const calculatedSceneInfo = getCalculatedSceneInfoByInnerHeight(window);
       const newCurrentScene = getNewCurrentSceneOnLoad(
         window.scrollY,
-        initalCalcuatedSceneInfo,
+        calculatedSceneInfo,
       );
 
       setShowScrolElementToBodyByCurrentScene(newCurrentScene);
-      setLayout(initalCalcuatedSceneInfo);
+      setLayout(calculatedSceneInfo);
 
       currentScene = newCurrentScene;
     },
@@ -49,20 +41,19 @@ window.addEventListener(
   window.addEventListener(
     'scroll',
     () => {
+      const calculatedSceneInfo = getCalculatedSceneInfoByInnerHeight(window);
       const [newCurrentScene, prevScrollHeight] = getNewCurrentScene(
         window.scrollY,
         currentScene,
-        initalCalcuatedSceneInfo,
+        calculatedSceneInfo,
       );
 
       setShowScrolElementToBodyByCurrentScene(newCurrentScene);
 
       if (currentScene === newCurrentScene) {
-        playAnimationWithCalculatedSceneInfo(
-          newCurrentScene,
-          prevScrollHeight,
-          window.scrollY,
-        );
+        playAnimation
+          (calculatedSceneInfo)
+          (newCurrentScene, prevScrollHeight, window.scrollY);
       }
 
       currentScene = newCurrentScene;
