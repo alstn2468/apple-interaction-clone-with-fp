@@ -42,14 +42,14 @@ const getCalculatedCSSValue = (
         if (startHeight <= currentSceneScrollY
           && currentSceneScrollY <= endHeight) {
           return getValueByRatio(
-            (currentSceneScrollY - startHeight) / endHeight - startHeight
+            (currentSceneScrollY - startHeight) / (endHeight - startHeight)
           );
         }
         if (currentSceneScrollY < startHeight) {
-          return start;
+          return O.some(start);
         }
         if (currentSceneScrollY > endHeight) {
-          return end;
+          return O.some(end);
         }
       }
       return getValueByRatio(currentSceneScrollY / currentSceneScrollHeight);
