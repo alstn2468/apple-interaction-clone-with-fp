@@ -1,3 +1,6 @@
+import { pipe } from 'fp-ts/lib/function';
+import * as A from 'fp-ts/lib/Array';
+
 import './css/reset.css';
 import './css/style.css';
 import './css/footer.css';
@@ -12,43 +15,48 @@ import {
   getNewCurrentSceneOnLoad,
   setShowScrolElementToBody,
 } from './script/scroll';
+import { setVideoImages } from './script/video';
 
-const getCalculatedSceneInfoByInnerHeight =
-  getCalculatedSceneInfo(sceneInfoArray);
 const setShowScrolElementToBodyByCurrentScene =
   setShowScrolElementToBody(document);
 
-window.addEventListener('resize', () =>
-  setLayout(getCalculatedSceneInfoByInnerHeight(window)),
-);
-
 (() => {
+  let calculatedSceneInfoArray: typeof sceneInfoArray = sceneInfoArray;
   let currentScene = 0;
+  const getCalculatedSceneInfoByInnerHeight = getCalculatedSceneInfo(
+    calculatedSceneInfoArray,
+  );
+  window.addEventListener('resize', () =>
+    setLayout(getCalculatedSceneInfoByInnerHeight(window)),
+  );
   window.addEventListener('load', () => {
-    const calculatedSceneInfo = getCalculatedSceneInfoByInnerHeight(window);
+    calculatedSceneInfoArray = pipe(
+      window,
+      getCalculatedSceneInfoByInnerHeight,
+      A.map(setVideoImages),
+    );
 
     const newCurrentScene = getNewCurrentSceneOnLoad(
       window.scrollY,
-      calculatedSceneInfo,
+      calculatedSceneInfoArray,
     );
 
     setShowScrolElementToBodyByCurrentScene(newCurrentScene);
-    setLayout(calculatedSceneInfo);
+    setLayout(calculatedSceneInfoArray);
 
     currentScene = newCurrentScene;
   });
   window.addEventListener('scroll', () => {
-    const calculatedSceneInfo = getCalculatedSceneInfoByInnerHeight(window);
     const [newCurrentScene, prevScrollHeight] = getNewCurrentScene(
       window.scrollY,
       currentScene,
-      calculatedSceneInfo,
+      calculatedSceneInfoArray,
     );
 
     setShowScrolElementToBodyByCurrentScene(newCurrentScene);
 
     if (currentScene === newCurrentScene) {
-      playAnimation(calculatedSceneInfo)(
+      playAnimation(calculatedSceneInfoArray)(
         newCurrentScene,
         prevScrollHeight,
         window.scrollY,

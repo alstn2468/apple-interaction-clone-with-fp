@@ -5,6 +5,7 @@ import { pipe, constVoid } from 'fp-ts/lib/function';
 
 import { SceneInfo } from './sceneInfo';
 import { setElementStyle } from './dom';
+import { playVideo } from './video';
 
 type CSSValue = number;
 type AnimationValue = {
@@ -106,14 +107,9 @@ const getCalculatedAnimationObject =
   };
 
 const getCalculatedAnimationObjects =
-  (
-    currentSceneScrollHeight: number,
-    prevScrollHeight: number,
-    scrollY: number,
-  ) =>
+  (currentSceneScrollHeight: number, currentSceneScrollY: number) =>
   (animation: Animation) => {
-    const currentSceneScrollY = scrollY - prevScrollHeight;
-    const scrollRatio = (scrollY - prevScrollHeight) / currentSceneScrollHeight;
+    const scrollRatio = currentSceneScrollY / currentSceneScrollHeight;
     return pipe(
       Object.entries(animation),
       A.map((animationEntry) =>
@@ -156,15 +152,15 @@ const playAnimation =
       O.fromNullable,
       O.match(
         constVoid,
-        ({ objs: { elements }, animations, scrollHeight, type }) => {
+        ({ objs: { elements }, animations, scrollHeight, type, canvas }) => {
+          const currentSceneScrollY = scrollY - prevScrollHeight;
           if (type === 'sticky') {
             pipe(
               animations,
               A.map(
                 getCalculatedAnimationObjects(
                   scrollHeight,
-                  prevScrollHeight,
-                  scrollY,
+                  currentSceneScrollY,
                 ),
               ),
               A.zip(elements),
@@ -176,6 +172,8 @@ const playAnimation =
               ),
             );
           }
+
+          pipe(canvas, playVideo(scrollHeight, currentSceneScrollY));
         },
       ),
     );
