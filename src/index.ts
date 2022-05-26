@@ -26,6 +26,7 @@ window.addEventListener('resize', () =>
   let currentScene = 0;
   window.addEventListener('load', () => {
     const calculatedSceneInfo = getCalculatedSceneInfoByInnerHeight(window);
+
     const newCurrentScene = getNewCurrentSceneOnLoad(
       window.scrollY,
       calculatedSceneInfo,

@@ -1,4 +1,4 @@
-import type { Animation } from './animation';
+import type { Animation, AnimationValue } from './animation';
 import * as O from 'fp-ts/lib/Option';
 
 type SceneType = 'sticky' | 'normal';
@@ -8,6 +8,13 @@ type SceneInfo = {
   scrollHeight: number;
   type: SceneType;
   selectors: Array<string>;
+  canvas?: {
+    element: O.Option<HTMLCanvasElement>;
+    folder: string;
+    videoImageCount: number;
+    imageSequence: AnimationValue;
+    videoImages: Array<string>;
+  };
   objs: {
     container: O.Option<HTMLElement>;
     elements: Array<HTMLElement>;
@@ -21,7 +28,14 @@ const sceneInfoArray: SceneInfo[] = [
     type: 'sticky',
     heightMultiple: 5,
     scrollHeight: 0,
-    selectors: ['.sticky-element'],
+    selectors: ['.sticky-element:not(.sticky-element-canvas)'],
+    canvas: {
+      element: O.none,
+      videoImageCount: 300,
+      folder: './video/001',
+      imageSequence: { start: 0, end: 299 },
+      videoImages: [],
+    },
     objs: {
       container: O.none,
       elements: [],

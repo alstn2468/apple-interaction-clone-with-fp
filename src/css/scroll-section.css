@@ -11,6 +11,12 @@
   width: 100%;
 }
 
+.sticky-element-canvas {
+  top: 0;
+  background-color: gray;
+  opacity: 0.4;
+}
+
 #scroll-section-0 h1 {
   font-size: 4rem;
   text-align: center;

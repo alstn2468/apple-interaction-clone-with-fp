@@ -180,4 +180,9 @@ const playAnimation =
       ),
     );
 
-export { type Animation, playAnimation };
+export {
+  type AnimationValue,
+  type Animation,
+  playAnimation,
+  getCalculatedCSSValue,
+};

@@ -10,9 +10,10 @@
     "check-types": "tsc --noEmit --skipLibCheck",
     "lint-staged": "lint-staged",
     "copy-html": "cp src/index.html dist",
-    "start": "yarn copy-html && esbuild src/index.ts --bundle --outfile=dist/index.js --servedir=dist",
-    "watch": "yarn copy-html && esbuild src/index.ts --bundle --outfile=dist/index.js --watch",
-    "build": "esbuild src/index.ts --bundle --minify --sourcemap=external --outfile=dist/index.js && yarn copy-html",
+    "copy-video": "cp -R src/video dist/video",
+    "start": "yarn copy-html && esbuild src/index.ts --bundle --loader:.png,.jpg=file --outfile=dist/index.js --servedir=dist",
+    "watch": "yarn copy-html && esbuild src/index.ts --bundle --loader:.png,.jpg=file --outfile=dist/index.js --watch",
+    "build": "esbuild src/index.ts --bundle --loader:.png,.jpg=file --minify --sourcemap=external --outfile=dist/index.js && yarn copy-html && yarn copy-video",
     "dev": "yarn start",
     "develop": "yarn start"
   },

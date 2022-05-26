@@ -2,6 +2,7 @@
 
 .global-nav,
 .local-nav {
+  z-index: 1;
   position: absolute;
   left: 0;
   width: 100%;

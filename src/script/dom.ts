@@ -4,8 +4,8 @@ import { pipe } from 'fp-ts/lib/function';
 const getElementById = (id: string) => (document: Document) =>
   pipe(document.getElementById(id), O.fromNullable);
 
-const querySelector = (selector: string) => (document: Document) =>
-  pipe(document.querySelector(selector) as HTMLElement | null, O.fromNullable);
+const querySelector = (element: HTMLElement) => (selector: string) =>
+  pipe(element.querySelector(selector) as HTMLElement | null, O.fromNullable);
 
 const querySelectorAll = (element: HTMLElement) => (selector: string) =>
   Array.from(element.querySelectorAll(selector)) as HTMLElement[];
