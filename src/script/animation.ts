@@ -156,7 +156,7 @@ const playAnimation =
       O.fromNullable,
       O.match(
         constVoid,
-        ({ objs: { messages }, animations, scrollHeight, type }) => {
+        ({ objs: { elements }, animations, scrollHeight, type }) => {
           if (type === 'sticky') {
             pipe(
               animations,
@@ -167,7 +167,7 @@ const playAnimation =
                   scrollY,
                 ),
               ),
-              A.zip(messages),
+              A.zip(elements),
               A.map(([animationObjects, element]) =>
                 pipe(
                   animationObjects,

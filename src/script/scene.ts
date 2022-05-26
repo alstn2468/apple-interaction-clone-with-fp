@@ -18,13 +18,13 @@ const setSceneInfoElementObject =
           () => sceneInfo,
           (element) =>
             pipe(
-              sceneInfo.selector,
+              sceneInfo.selectors,
               A.map(querySelectorAll(element)),
               A.flatten,
-              (messages) => ({
+              (elements) => ({
                 ...sceneInfo.objs,
                 container: optionElement,
-                messages,
+                elements,
               }),
               setSceneInfoValue('objs', sceneInfo),
             ),
