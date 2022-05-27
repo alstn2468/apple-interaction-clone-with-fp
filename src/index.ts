@@ -12,7 +12,7 @@ import {
   getNewCurrentSceneOnLoad,
   setShowScrolElementToBody,
 } from './script/scroll';
-import { drawImageOnLoad } from './script/video';
+import { playVideo } from './script/video';
 
 const setShowScrolElementToBodyByCurrentScene =
   setShowScrolElementToBody(document);
@@ -37,10 +37,18 @@ const setShowScrolElementToBodyByCurrentScene =
       window.scrollY,
       calculatedSceneInfoArray,
     );
+    const [, prevScrollHeight] = getNewCurrentScene(
+      window.scrollY,
+      newCurrentScene,
+      calculatedSceneInfoArray,
+    );
+    const currentSceneScrollY = scrollY - prevScrollHeight;
+    const currentSceneInfo = calculatedSceneInfoArray[newCurrentScene];
 
     setShowScrolElementToBodyByCurrentScene(newCurrentScene);
     setLayout(window.innerHeight, calculatedSceneInfoArray);
-    drawImageOnLoad(calculatedSceneInfoArray[newCurrentScene]);
+    playAnimation(currentSceneInfo, currentSceneScrollY);
+    playVideo(currentSceneInfo, currentSceneScrollY, true);
 
     currentScene = newCurrentScene;
   });
@@ -50,15 +58,14 @@ const setShowScrolElementToBodyByCurrentScene =
       currentScene,
       calculatedSceneInfoArray,
     );
+    const currentSceneScrollY = scrollY - prevScrollHeight;
 
     setShowScrolElementToBodyByCurrentScene(newCurrentScene);
 
     if (currentScene === newCurrentScene) {
-      playAnimation(calculatedSceneInfoArray)(
-        newCurrentScene,
-        prevScrollHeight,
-        window.scrollY,
-      );
+      const currentSceneInfo = calculatedSceneInfoArray[newCurrentScene];
+      playAnimation(currentSceneInfo, currentSceneScrollY);
+      playVideo(currentSceneInfo, currentSceneScrollY);
     }
 
     currentScene = newCurrentScene;

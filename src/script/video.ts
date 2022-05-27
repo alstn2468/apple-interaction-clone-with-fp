@@ -54,38 +54,53 @@ const setVideoImages = (sceneInfo: SceneInfo) =>
       ),
   );
 
-const drawImageOnLoad = (sceneInfo: SceneInfo) =>
+const drawImageOnLoad = (
+  videoImages: HTMLImageElement[],
+  calculatedImageSequence: number,
+  element: O.Option<HTMLCanvasElement>,
+) =>
+  (videoImages[calculatedImageSequence].onload = () =>
+    pipe(
+      element,
+      drawImageToCanvasContext(videoImages[calculatedImageSequence]),
+    ));
+
+const playVideo = (
+  sceneInfo: SceneInfo,
+  currentSceneScrollY: number,
+  isFirstLoad = false,
+) => {
   pipe(
     sceneInfo.canvas,
     O.fromNullable,
-    O.map(({ element, videoImages, imageSequence }) =>
-      pipe(element, drawImageToCanvasContext(videoImages[imageSequence.start])),
-    ),
-  );
-
-const playVideo =
-  (currentSceneScrollHeight: number, currentSceneScrollY: number) =>
-  (canvas: SceneInfo['canvas']) => {
-    pipe(
-      canvas,
-      O.fromNullable,
-      O.map(({ imageSequence, element, videoImages }) =>
-        pipe(
-          getCalculatedCSSValue(
-            imageSequence,
-            currentSceneScrollHeight,
-            currentSceneScrollY,
-          ),
-          O.map(Math.round),
-          O.map((calculatedImageSequence) =>
-            pipe(
-              element,
-              drawImageToCanvasContext(videoImages[calculatedImageSequence]),
+    O.map(({ imageSequence, element, videoImages }) =>
+      pipe(
+        getCalculatedCSSValue(
+          imageSequence,
+          sceneInfo.scrollHeight,
+          currentSceneScrollY,
+        ),
+        O.map(Math.round),
+        O.map((calculatedImageSequence) =>
+          pipe(
+            isFirstLoad,
+            O.fromPredicate(Boolean),
+            O.match(
+              () =>
+                pipe(
+                  element,
+                  drawImageToCanvasContext(
+                    videoImages[calculatedImageSequence],
+                  ),
+                ),
+              () =>
+                drawImageOnLoad(videoImages, calculatedImageSequence, element),
             ),
           ),
         ),
       ),
-    );
-  };
+    ),
+  );
+};
 
-export { getVideoImages, setVideoImages, drawImageOnLoad, playVideo };
+export { getVideoImages, setVideoImages, playVideo };

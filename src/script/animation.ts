@@ -5,7 +5,6 @@ import { pipe, constVoid } from 'fp-ts/lib/function';
 
 import { SceneInfo } from './sceneInfo';
 import { setElementStyle } from './dom';
-import { playVideo } from './video';
 
 type CSSValue = number;
 type AnimationValue = {
@@ -144,39 +143,31 @@ const applyAnimationObjectStyleToElement =
       ),
     );
 
-const playAnimation =
-  (sceneInfoArray: SceneInfo[]) =>
-  (currentScene: number, prevScrollHeight: number, scrollY: number) =>
-    pipe(
-      sceneInfoArray[currentScene],
-      O.fromNullable,
-      O.match(
-        constVoid,
-        ({ objs: { elements }, animations, scrollHeight, type, canvas }) => {
-          const currentSceneScrollY = scrollY - prevScrollHeight;
-          if (type === 'sticky') {
-            pipe(
-              animations,
-              A.map(
-                getCalculatedAnimationObjects(
-                  scrollHeight,
-                  currentSceneScrollY,
-                ),
+const playAnimation = (sceneInfo: SceneInfo, currentSceneScrollY: number) =>
+  pipe(
+    sceneInfo,
+    O.fromNullable,
+    O.match(
+      constVoid,
+      ({ objs: { elements }, animations, scrollHeight, type }) => {
+        if (type === 'sticky') {
+          pipe(
+            animations,
+            A.map(
+              getCalculatedAnimationObjects(scrollHeight, currentSceneScrollY),
+            ),
+            A.zip(elements),
+            A.map(([animationObjects, element]) =>
+              pipe(
+                animationObjects,
+                applyAnimationObjectStyleToElement(element),
               ),
-              A.zip(elements),
-              A.map(([animationObjects, element]) =>
-                pipe(
-                  animationObjects,
-                  applyAnimationObjectStyleToElement(element),
-                ),
-              ),
-            );
-          }
-
-          pipe(canvas, playVideo(scrollHeight, currentSceneScrollY));
-        },
-      ),
-    );
+            ),
+          );
+        }
+      },
+    ),
+  );
 
 export {
   type AnimationValue,
