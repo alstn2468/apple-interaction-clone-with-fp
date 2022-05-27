@@ -3,6 +3,7 @@ import * as A from 'fp-ts/lib/Array';
 import * as O from 'fp-ts/lib/Option';
 import { getElementById, querySelector, querySelectorAll } from './dom';
 import { type SceneInfo } from './sceneInfo';
+import { setVideoImages } from './video';
 
 const getScrollSectionId = (index: number) => `scroll-section-${index}`;
 
@@ -89,13 +90,25 @@ const setScrollHeight = (innerHeight: number) => (sceneInfo: SceneInfo) =>
     O.match(() => sceneInfo, setSceneInfoValue('scrollHeight', sceneInfo)),
   );
 
-const getCalculatedSceneInfo =
-  (sceneInfoArray: SceneInfo[]) => (window: Window) =>
-    pipe(
-      sceneInfoArray,
-      A.mapWithIndex(setSceneInfoElementObject(window.document)),
-      A.mapWithIndex(setCanvasElement(window.document)),
-      A.map(setScrollHeight(window.innerHeight)),
-    );
+const getCalculatedSceneInfoArray = (
+  window: Window,
+  sceneInfoArray: SceneInfo[],
+  isFirstLoad = false,
+) =>
+  pipe(
+    isFirstLoad,
+    O.fromPredicate(Boolean),
+    O.match(
+      () => sceneInfoArray,
+      () =>
+        pipe(
+          sceneInfoArray,
+          A.map(setVideoImages),
+          A.mapWithIndex(setSceneInfoElementObject(window.document)),
+          A.mapWithIndex(setCanvasElement(window.document)),
+        ),
+    ),
+    A.map(setScrollHeight(window.innerHeight)),
+  );
 
-export { setSceneInfoValue, getSceneInfoValue, getCalculatedSceneInfo };
+export { setSceneInfoValue, getSceneInfoValue, getCalculatedSceneInfoArray };

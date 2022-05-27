@@ -59,7 +59,6 @@ const playVideo =
               currentSceneScrollY,
             ),
           O.map(Math.round),
-          console.log,
         ),
       ),
     );
