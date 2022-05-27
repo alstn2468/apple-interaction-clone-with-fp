@@ -1,6 +1,6 @@
 import * as A from 'fp-ts/lib/Array';
 import * as O from 'fp-ts/lib/Option';
-import { constVoid, pipe } from 'fp-ts/lib/function';
+import { constVoid, pipe, flow } from 'fp-ts/lib/function';
 
 import { setElementStyle } from './dom';
 import { type SceneInfo } from './sceneInfo';
@@ -20,9 +20,32 @@ const setElementScrollHeight = (sceneInfo: SceneInfo) =>
         (apply) => apply(element),
       ),
     ),
+    () => sceneInfo,
   );
 
-const setLayout = (sceneInfoArray: SceneInfo[]) =>
-  pipe(sceneInfoArray, A.map(setElementScrollHeight));
+const setCanvasScale = (innerHeight: number) => (sceneInfo: SceneInfo) =>
+  pipe(
+    sceneInfo.canvas,
+    O.fromNullable,
+    O.map(({ element }) =>
+      pipe(
+        element,
+        O.map(
+          setElementStyle(
+            'transform',
+            innerHeight / 1080,
+            'translate3d(-50%, -50%, 0) scale({value})',
+          ),
+        ),
+      ),
+    ),
+    () => sceneInfo,
+  );
+
+const setLayout = (innerHeight: number, sceneInfoArray: SceneInfo[]) =>
+  pipe(
+    sceneInfoArray,
+    A.map(flow(setElementScrollHeight, setCanvasScale(innerHeight))),
+  );
 
 export { setLayout };

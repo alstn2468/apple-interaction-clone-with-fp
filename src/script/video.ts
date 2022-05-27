@@ -1,22 +1,24 @@
-import { constUndefined, flow, identity, pipe } from 'fp-ts/lib/function';
+import { constUndefined, constVoid, identity, pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/lib/Option';
 import * as NEA from 'fp-ts/lib/NonEmptyArray';
-import { setAttribute } from './dom';
 
+import { setAttribute } from './dom';
 import { type SceneInfo } from './sceneInfo';
-import { getCalculatedCSSValue } from './animation';
 import { setSceneInfoValue } from './scene';
+import { getCalculatedCSSValue } from './animation';
 
 const getCanvasContext = (canvasElement: HTMLCanvasElement) =>
-  canvasElement.getContext('2d');
+  O.fromNullable(canvasElement.getContext('2d'));
 
-const drawImageToConvasContext =
-  (image: HTMLImageElement) =>
-  (canvasContext: ReturnType<typeof getCanvasContext>) =>
+const drawImageToCanvasContext =
+  (image: HTMLImageElement) => (element: O.Option<HTMLCanvasElement>) =>
     pipe(
-      canvasContext,
-      O.fromNullable,
-      O.map((canvasContext) => canvasContext.drawImage(image, 0, 0)),
+      element,
+      O.map(getCanvasContext),
+      O.flatten,
+      O.match(constVoid, (canvasContext) =>
+        canvasContext.drawImage(image, 0, 0),
+      ),
     );
 
 const getImagePath = (folder: string) => (num: number) =>
@@ -52,6 +54,15 @@ const setVideoImages = (sceneInfo: SceneInfo) =>
       ),
   );
 
+const drawImageOnLoad = (sceneInfo: SceneInfo) =>
+  pipe(
+    sceneInfo.canvas,
+    O.fromNullable,
+    O.map(({ element, videoImages, imageSequence }) =>
+      pipe(element, drawImageToCanvasContext(videoImages[imageSequence.start])),
+    ),
+  );
+
 const playVideo =
   (currentSceneScrollHeight: number, currentSceneScrollY: number) =>
   (canvas: SceneInfo['canvas']) => {
@@ -69,14 +80,7 @@ const playVideo =
           O.map((calculatedImageSequence) =>
             pipe(
               element,
-              O.map(
-                flow(
-                  getCanvasContext,
-                  drawImageToConvasContext(
-                    videoImages[calculatedImageSequence],
-                  ),
-                ),
-              ),
+              drawImageToCanvasContext(videoImages[calculatedImageSequence]),
             ),
           ),
         ),
@@ -84,4 +88,4 @@ const playVideo =
     );
   };
 
-export { getVideoImages, setVideoImages, playVideo };
+export { getVideoImages, setVideoImages, drawImageOnLoad, playVideo };

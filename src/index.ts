@@ -12,6 +12,7 @@ import {
   getNewCurrentSceneOnLoad,
   setShowScrolElementToBody,
 } from './script/scroll';
+import { drawImageOnLoad } from './script/video';
 
 const setShowScrolElementToBodyByCurrentScene =
   setShowScrolElementToBody(document);
@@ -20,7 +21,10 @@ const setShowScrolElementToBodyByCurrentScene =
   let calculatedSceneInfoArray = sceneInfoArray;
   let currentScene = 0;
   window.addEventListener('resize', () =>
-    setLayout(getCalculatedSceneInfoArray(window, calculatedSceneInfoArray)),
+    setLayout(
+      window.innerHeight,
+      getCalculatedSceneInfoArray(window, calculatedSceneInfoArray),
+    ),
   );
   window.addEventListener('load', () => {
     calculatedSceneInfoArray = getCalculatedSceneInfoArray(
@@ -35,7 +39,8 @@ const setShowScrolElementToBodyByCurrentScene =
     );
 
     setShowScrolElementToBodyByCurrentScene(newCurrentScene);
-    setLayout(calculatedSceneInfoArray);
+    setLayout(window.innerHeight, calculatedSceneInfoArray);
+    drawImageOnLoad(calculatedSceneInfoArray[newCurrentScene]);
 
     currentScene = newCurrentScene;
   });

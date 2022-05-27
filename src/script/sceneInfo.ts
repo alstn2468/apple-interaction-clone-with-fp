@@ -1,5 +1,6 @@
-import type { Animation, AnimationValue } from './animation';
 import * as O from 'fp-ts/lib/Option';
+
+import type { Animation, AnimationValue } from './animation';
 
 type SceneType = 'sticky' | 'normal';
 type SceneInfo = {
@@ -28,7 +29,7 @@ const sceneInfoArray: SceneInfo[] = [
     type: 'sticky',
     heightMultiple: 5,
     scrollHeight: 0,
-    selectors: ['.sticky-element:not(.sticky-element-canvas)'],
+    selectors: ['.sticky-element:not(.sticky-element-canvas)', '.video-canvas'],
     canvas: {
       element: O.none,
       videoImageCount: 300,
@@ -123,6 +124,13 @@ const sceneInfoArray: SceneInfo[] = [
             template: 'translate3d(0, {value}%, 0)',
             timing: { start: 0.85, end: 0.9 },
           },
+        },
+      },
+      {
+        // #scroll-section-0 .video-canvas:nth-child(1)
+        opacity: {
+          in: { start: 1, end: 0, timing: { start: 0.9, end: 1 } },
+          out: { start: 1, end: 0, timing: { start: 0.9, end: 1 } },
         },
       },
     ],
