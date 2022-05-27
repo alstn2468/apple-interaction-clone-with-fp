@@ -13,7 +13,7 @@ type SceneInfo = {
     folder: string;
     videoImageCount: number;
     imageSequence: AnimationValue;
-    videoImages: Array<Element>;
+    videoImages: Array<HTMLImageElement>;
   };
   objs: {
     container: O.Option<HTMLElement>;

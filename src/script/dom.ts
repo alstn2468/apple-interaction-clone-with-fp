@@ -4,28 +4,31 @@ import { pipe } from 'fp-ts/lib/function';
 const getElementById = (id: string) => (document: Document) =>
   pipe(document.getElementById(id), O.fromNullable);
 
-const querySelector = (element: HTMLElement) => (selector: string) =>
-  pipe(element.querySelector(selector) as HTMLElement | null, O.fromNullable);
+const querySelector =
+  <T extends Element>(element: T) =>
+  (selector: string) =>
+    pipe(element.querySelector(selector), O.fromNullable);
 
-const querySelectorAll = (element: HTMLElement) => (selector: string) =>
-  Array.from(element.querySelectorAll(selector)) as HTMLElement[];
+const querySelectorAll =
+  <T extends Element>(element: T) =>
+  (selector: string) =>
+    Array.from(element.querySelectorAll(selector)) as HTMLElement[];
 
-const addClassName = (className: string) => (element: Element) => (
-  element.classList.add(className), element
-);
+const addClassName =
+  <T extends Element>(className: string) =>
+  (element: T) => (element.classList.add(className), element);
 
-const removeClassName = (className: string) => (element: Element) => (
-  element.classList.remove(className), element
-);
+const removeClassName =
+  <T extends Element>(className: string) =>
+  (element: T) => (element.classList.remove(className), element);
 
 const setAttribute =
-  (attribute: string, value: string) => (element: Element) => (
-    element.setAttribute(attribute, value), element
-  );
+  <T extends Element>(attribute: string, value: string) =>
+  (element: T) => (element.setAttribute(attribute, value), element);
 
 const setElementStyle =
-  (property: string, value: number, template?: string) =>
-  (element: HTMLElement) =>
+  <T extends HTMLElement>(property: string, value: number, template?: string) =>
+  (element: T) =>
     element.style.setProperty(
       property,
       template
@@ -33,9 +36,9 @@ const setElementStyle =
         : value.toString(),
     );
 
-const removeChild = (child: Node) => (element: Element) => (
-  element.removeChild(child), element
-);
+const removeChild =
+  <T extends Element>(child: Node) =>
+  (element: T) => (element.removeChild(child), element);
 
 const addClassNameToBody = (className: string) => (document: Document) =>
   pipe(document.body, addClassName(className));

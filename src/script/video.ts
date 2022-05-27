@@ -1,4 +1,4 @@
-import { constUndefined, identity, pipe } from 'fp-ts/lib/function';
+import { constUndefined, flow, identity, pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/lib/Option';
 import * as NEA from 'fp-ts/lib/NonEmptyArray';
 import { setAttribute } from './dom';
@@ -9,6 +9,15 @@ import { setSceneInfoValue } from './scene';
 
 const getCanvasContext = (canvasElement: HTMLCanvasElement) =>
   canvasElement.getContext('2d');
+
+const drawImageToConvasContext =
+  (image: HTMLImageElement) =>
+  (canvasContext: ReturnType<typeof getCanvasContext>) =>
+    pipe(
+      canvasContext,
+      O.fromNullable,
+      O.map((canvasContext) => canvasContext.drawImage(image, 0, 0)),
+    );
 
 const getImagePath = (folder: string) => (num: number) =>
   `${folder}/${num.toString().padStart(4, '0')}.JPG`;
@@ -33,7 +42,7 @@ const setVideoImages = (sceneInfo: SceneInfo) =>
   pipe(
     sceneInfo,
     getVideoImages,
-    O.match(() => [] as Array<Element>, identity),
+    O.match(() => [] as Array<HTMLImageElement>, identity),
     (videoImages) =>
       pipe(
         sceneInfo.canvas,
@@ -49,16 +58,27 @@ const playVideo =
     pipe(
       canvas,
       O.fromNullable,
-      O.map(({ imageSequence }) =>
+      O.map(({ imageSequence, element, videoImages }) =>
         pipe(
-          imageSequence,
-          (imageSequence) =>
-            getCalculatedCSSValue(
-              imageSequence,
-              currentSceneScrollHeight,
-              currentSceneScrollY,
-            ),
+          getCalculatedCSSValue(
+            imageSequence,
+            currentSceneScrollHeight,
+            currentSceneScrollY,
+          ),
           O.map(Math.round),
+          O.map((calculatedImageSequence) =>
+            pipe(
+              element,
+              O.map(
+                flow(
+                  getCanvasContext,
+                  drawImageToConvasContext(
+                    videoImages[calculatedImageSequence],
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
