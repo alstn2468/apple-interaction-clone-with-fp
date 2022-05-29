@@ -1,6 +1,6 @@
 import * as A from 'fp-ts/lib/Array';
 import * as O from 'fp-ts/lib/Option';
-import { constUndefined, pipe } from 'fp-ts/lib/function';
+import { pipe } from 'fp-ts/lib/function';
 
 import { setVideoImages } from './video';
 import { getElementById, querySelector, querySelectorAll } from './dom';
@@ -44,25 +44,21 @@ const setCanvasElement =
   (document: Document) => (index: number, sceneInfo: SceneInfo) => {
     switch (sceneInfo.type) {
       case 'sticky':
-        return pipe(
-          sceneInfo.canvas,
-          O.fromNullable,
-          O.match(constUndefined, (canvas) =>
-            pipe(index, getScrollSectionElement(document), (optionElement) =>
-              pipe(
-                optionElement,
-                O.match(constUndefined, (element) =>
-                  pipe(
-                    querySelector(element)(
-                      '.video-canvas',
-                    ) as O.Option<HTMLCanvasElement>,
-                    (element) => ({ ...canvas, element }),
-                  ),
+        return pipe(index, getScrollSectionElement(document), (optionElement) =>
+          pipe(
+            optionElement,
+            O.match(
+              () => sceneInfo.canvas,
+              (element) =>
+                pipe(
+                  querySelector(element)(
+                    '.video-canvas',
+                  ) as O.Option<HTMLCanvasElement>,
+                  (element) => ({ ...sceneInfo.canvas, element }),
                 ),
-              ),
             ),
+            (canvas) => ({ ...sceneInfo, canvas }),
           ),
-          (canvas) => ({ ...sceneInfo, canvas }),
         );
 
       case 'normal':

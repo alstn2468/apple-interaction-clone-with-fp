@@ -20,7 +20,7 @@ declare global {
         scrollHeight: number;
         type: 'sticky';
         selectors: Array<string>;
-        canvas?: Canvas;
+        canvas: Canvas;
         objs: {
           container: Option<HTMLElement>;
           elements: Array<HTMLElement>;

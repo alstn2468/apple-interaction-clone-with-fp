@@ -1,6 +1,6 @@
 import * as O from 'fp-ts/lib/Option';
 import * as NEA from 'fp-ts/lib/NonEmptyArray';
-import { constUndefined, constVoid, identity, pipe } from 'fp-ts/lib/function';
+import { constVoid, identity, pipe } from 'fp-ts/lib/function';
 
 import { setAttribute } from './dom';
 import { getCalculatedCSSValue } from './animation';
@@ -28,18 +28,13 @@ const createImage = (src: string) =>
 const getVideoImages = (sceneInfo: SceneInfo) => {
   switch (sceneInfo.type) {
     case 'sticky':
-      switch (sceneInfo.canvas?.type) {
+      switch (sceneInfo.canvas.type) {
         case 'video':
           return pipe(
-            sceneInfo.canvas,
-            O.fromNullable,
-            O.map((canvas) =>
-              pipe(
-                NEA.range(0, canvas.videoImageCount - 1),
-                NEA.mapWithIndex(getImagePath(canvas.folder)),
-                NEA.map(createImage),
-              ),
-            ),
+            NEA.range(0, sceneInfo.canvas.videoImageCount - 1),
+            NEA.mapWithIndex(getImagePath(sceneInfo.canvas.folder)),
+            NEA.map(createImage),
+            O.some,
           );
       }
   }
@@ -56,8 +51,7 @@ const setVideoImages = (sceneInfo: SceneInfo) => {
         (videoImages) =>
           pipe(
             sceneInfo.canvas,
-            O.fromNullable,
-            O.match(constUndefined, (canvas) => ({ ...canvas, videoImages })),
+            (canvas) => ({ ...canvas, videoImages }),
             (canvas) => ({ ...sceneInfo, canvas }),
           ),
       );
@@ -85,44 +79,40 @@ const playVideo = (
 ) => {
   switch (sceneInfo.type) {
     case 'sticky':
-      pipe(
-        sceneInfo.canvas,
-        O.fromNullable,
-        O.map((canvas) => {
-          switch (canvas.type) {
-            case 'video':
+      switch (sceneInfo.canvas.type) {
+        case 'video': {
+          const canvas = sceneInfo.canvas;
+          return pipe(
+            getCalculatedCSSValue(
+              canvas.imageSequence,
+              sceneInfo.scrollHeight,
+              currentSceneScrollY,
+            ),
+            O.map(Math.round),
+            O.map((calculatedImageSequence) =>
               pipe(
-                getCalculatedCSSValue(
-                  canvas.imageSequence,
-                  sceneInfo.scrollHeight,
-                  currentSceneScrollY,
-                ),
-                O.map(Math.round),
-                O.map((calculatedImageSequence) =>
-                  pipe(
-                    isFirstLoad,
-                    O.fromPredicate(Boolean),
-                    O.match(
-                      () =>
-                        pipe(
-                          canvas.element,
-                          drawImageToCanvasContext(
-                            canvas.videoImages[calculatedImageSequence],
-                          ),
-                        ),
-                      () =>
-                        drawImageOnLoad(
-                          canvas.videoImages,
-                          calculatedImageSequence,
-                          canvas.element,
-                        ),
+                isFirstLoad,
+                O.fromPredicate(Boolean),
+                O.match(
+                  () =>
+                    pipe(
+                      canvas.element,
+                      drawImageToCanvasContext(
+                        canvas.videoImages[calculatedImageSequence],
+                      ),
                     ),
-                  ),
+                  () =>
+                    drawImageOnLoad(
+                      canvas.videoImages,
+                      calculatedImageSequence,
+                      canvas.element,
+                    ),
                 ),
-              );
-          }
-        }),
-      );
+              ),
+            ),
+          );
+        }
+      }
   }
 };
 

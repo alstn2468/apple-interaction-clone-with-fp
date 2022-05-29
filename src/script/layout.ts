@@ -25,18 +25,14 @@ const setElementScrollHeight = (sceneInfo: SceneInfo) =>
 const setCanvasScale = (innerHeight: number) => (sceneInfo: SceneInfo) => {
   switch (sceneInfo.type) {
     case 'sticky':
-      return pipe(
-        sceneInfo.canvas,
-        O.fromNullable,
-        O.map(({ element }) =>
-          pipe(
-            element,
-            O.map(
-              setElementStyle(
-                'transform',
-                innerHeight / 1080,
-                'translate3d(-50%, -50%, 0) scale({value})',
-              ),
+      return pipe(sceneInfo.canvas, ({ element }) =>
+        pipe(
+          element,
+          O.map(
+            setElementStyle(
+              'transform',
+              innerHeight / 1080,
+              'translate3d(-50%, -50%, 0) scale({value})',
             ),
           ),
         ),

@@ -124,31 +124,23 @@ const applyAnimationObjectStyleToElement =
       ),
     );
 
-const playAnimation = (sceneInfo: SceneInfo, currentSceneScrollY: number) =>
-  pipe(
-    sceneInfo,
-    O.fromNullable,
-    O.match(constVoid, (sceneInfo) => {
-      switch (sceneInfo.type) {
-        case 'sticky':
-          pipe(
-            sceneInfo.animations,
-            A.map(
-              getCalculatedAnimationObjects(
-                sceneInfo.scrollHeight,
-                currentSceneScrollY,
-              ),
-            ),
-            A.zip(sceneInfo.objs.elements),
-            A.map(([animationObjects, element]) =>
-              pipe(
-                animationObjects,
-                applyAnimationObjectStyleToElement(element),
-              ),
-            ),
-          );
-      }
-    }),
-  );
+const playAnimation = (sceneInfo: SceneInfo, currentSceneScrollY: number) => {
+  switch (sceneInfo.type) {
+    case 'sticky':
+      pipe(
+        sceneInfo.animations,
+        A.map(
+          getCalculatedAnimationObjects(
+            sceneInfo.scrollHeight,
+            currentSceneScrollY,
+          ),
+        ),
+        A.zip(sceneInfo.objs.elements),
+        A.map(([animationObjects, element]) =>
+          pipe(animationObjects, applyAnimationObjectStyleToElement(element)),
+        ),
+      );
+  }
+};
 
 export { playAnimation, getCalculatedCSSValue };
