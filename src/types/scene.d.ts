@@ -1,24 +1,37 @@
 import { type Option } from 'fp-ts/lib/Option';
 
 declare global {
-  type SceneType = 'sticky' | 'normal';
-  type SceneInfo = {
-    // 브라우저 높이의 배수
-    heightMultiple: number;
-    scrollHeight: number;
-    type: SceneType;
-    selectors: Array<string>;
-    canvas?: {
-      element: Option<HTMLCanvasElement>;
-      folder: string;
-      videoImageCount: number;
-      imageSequence: AnimationValue;
-      videoImages: Array<HTMLImageElement>;
-    };
-    objs: {
-      container: Option<HTMLElement>;
-      elements: Array<HTMLElement>;
-    };
-    animations: Array<SceneAnimation>;
-  };
+  type Canvas =
+    | {
+        type: 'video';
+        element: Option<HTMLCanvasElement>;
+        folder: string;
+        videoImageCount: number;
+        imageSequence: AnimationValue;
+        videoImages: Array<HTMLImageElement>;
+      }
+    | {
+        type: 'image';
+        element: Option<HTMLCanvasElement>;
+      };
+  type SceneInfo =
+    | {
+        heightMultiple: number;
+        scrollHeight: number;
+        type: 'sticky';
+        selectors: Array<string>;
+        canvas?: Canvas;
+        objs: {
+          container: Option<HTMLElement>;
+          elements: Array<HTMLElement>;
+        };
+        animations: Array<SceneAnimation>;
+      }
+    | {
+        type: 'normal';
+        scrollHeight: number;
+        objs: {
+          container: Option<HTMLElement>;
+        };
+      };
 }

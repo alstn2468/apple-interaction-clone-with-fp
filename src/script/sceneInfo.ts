@@ -11,6 +11,7 @@ const sceneInfoArray: SceneInfo[] = [
     scrollHeight: 0,
     selectors: ['.sticky-element:not(.sticky-element-canvas)', '.video-canvas'],
     canvas: {
+      type: 'video',
       element: O.none,
       videoImageCount: 300,
       folder: './video/001',
@@ -118,14 +119,10 @@ const sceneInfoArray: SceneInfo[] = [
   {
     // #scroll-section-1
     type: 'normal',
-    heightMultiple: 5,
     scrollHeight: 0,
-    selectors: [],
     objs: {
       container: O.none,
-      elements: [],
     },
-    animations: [],
   },
   {
     // #scroll-section-2
@@ -138,6 +135,7 @@ const sceneInfoArray: SceneInfo[] = [
       '.video-canvas',
     ],
     canvas: {
+      type: 'video',
       element: O.none,
       videoImageCount: 960,
       folder: './video/002',
@@ -271,6 +269,10 @@ const sceneInfoArray: SceneInfo[] = [
     objs: {
       container: O.none,
       elements: [],
+    },
+    canvas: {
+      type: 'image',
+      element: O.none,
     },
     selectors: ['.canvas-caption'],
     animations: [

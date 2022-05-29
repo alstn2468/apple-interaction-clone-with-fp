@@ -22,24 +22,27 @@ const setElementScrollHeight = (sceneInfo: SceneInfo) =>
     () => sceneInfo,
   );
 
-const setCanvasScale = (innerHeight: number) => (sceneInfo: SceneInfo) =>
-  pipe(
-    sceneInfo.canvas,
-    O.fromNullable,
-    O.map(({ element }) =>
-      pipe(
-        element,
-        O.map(
-          setElementStyle(
-            'transform',
-            innerHeight / 1080,
-            'translate3d(-50%, -50%, 0) scale({value})',
+const setCanvasScale = (innerHeight: number) => (sceneInfo: SceneInfo) => {
+  if (sceneInfo.type === 'sticky') {
+    pipe(
+      sceneInfo.canvas,
+      O.fromNullable,
+      O.map(({ element }) =>
+        pipe(
+          element,
+          O.map(
+            setElementStyle(
+              'transform',
+              innerHeight / 1080,
+              'translate3d(-50%, -50%, 0) scale({value})',
+            ),
           ),
         ),
       ),
-    ),
-    () => sceneInfo,
-  );
+    );
+  }
+  return sceneInfo;
+};
 
 const setLayout = (innerHeight: number, sceneInfoArray: SceneInfo[]) =>
   pipe(

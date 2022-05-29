@@ -128,26 +128,23 @@ const playAnimation = (sceneInfo: SceneInfo, currentSceneScrollY: number) =>
   pipe(
     sceneInfo,
     O.fromNullable,
-    O.match(
-      constVoid,
-      ({ objs: { elements }, animations, scrollHeight, type }) => {
-        if (type === 'sticky') {
-          pipe(
-            animations,
-            A.map(
-              getCalculatedAnimationObjects(scrollHeight, currentSceneScrollY),
+    O.match(constVoid, (sceneInfo) => {
+      if (sceneInfo.type === 'sticky') {
+        pipe(
+          sceneInfo.animations,
+          A.map(
+            getCalculatedAnimationObjects(
+              sceneInfo.scrollHeight,
+              currentSceneScrollY,
             ),
-            A.zip(elements),
-            A.map(([animationObjects, element]) =>
-              pipe(
-                animationObjects,
-                applyAnimationObjectStyleToElement(element),
-              ),
-            ),
-          );
-        }
-      },
-    ),
+          ),
+          A.zip(sceneInfo.objs.elements),
+          A.map(([animationObjects, element]) =>
+            pipe(animationObjects, applyAnimationObjectStyleToElement(element)),
+          ),
+        );
+      }
+    }),
   );
 
 export { playAnimation, getCalculatedCSSValue };

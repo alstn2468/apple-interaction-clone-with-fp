@@ -17,77 +17,84 @@ const setSceneInfoElementObject =
         optionElement,
         O.match(
           () => sceneInfo,
-          (element) =>
-            pipe(
-              sceneInfo.selectors,
-              A.map(querySelectorAll(element)),
-              A.flatten,
-              (elements) => ({
-                ...sceneInfo.objs,
-                container: optionElement,
-                elements,
-              }),
-              setSceneInfoValue('objs', sceneInfo),
-            ),
+          (element) => {
+            switch (sceneInfo.type) {
+              case 'sticky':
+                return pipe(
+                  sceneInfo.selectors,
+                  A.map(querySelectorAll(element)),
+                  A.flatten,
+                  (elements) => ({
+                    ...sceneInfo.objs,
+                    container: optionElement,
+                    elements,
+                  }),
+                  (objs) => ({ ...sceneInfo, objs }),
+                );
+
+              case 'normal':
+                return sceneInfo;
+            }
+          },
         ),
       ),
     );
 
 const setCanvasElement =
-  (document: Document) => (index: number, sceneInfo: SceneInfo) =>
-    pipe(
-      sceneInfo.canvas,
-      O.fromNullable,
-      O.match(constUndefined, (canvas) =>
-        pipe(index, getScrollSectionElement(document), (optionElement) =>
-          pipe(
-            optionElement,
-            O.match(constUndefined, (element) =>
+  (document: Document) => (index: number, sceneInfo: SceneInfo) => {
+    switch (sceneInfo.type) {
+      case 'sticky':
+        return pipe(
+          sceneInfo.canvas,
+          O.fromNullable,
+          O.match(constUndefined, (canvas) =>
+            pipe(index, getScrollSectionElement(document), (optionElement) =>
               pipe(
-                querySelector(element)(
-                  '.video-canvas',
-                ) as O.Option<HTMLCanvasElement>,
-                (element) => ({ ...canvas, element }),
+                optionElement,
+                O.match(constUndefined, (element) =>
+                  pipe(
+                    querySelector(element)(
+                      '.video-canvas',
+                    ) as O.Option<HTMLCanvasElement>,
+                    (element) => ({ ...canvas, element }),
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
-      setSceneInfoValue('canvas', sceneInfo),
-    );
+          (canvas) => ({ ...sceneInfo, canvas }),
+        );
 
-const setSceneInfoValue =
-  <T extends keyof SceneInfo>(key: T, sceneInfo: SceneInfo) =>
-  (value: SceneInfo[T]) => ({ ...sceneInfo, [key]: value });
-
-const getSceneInfoValue =
-  <T extends keyof SceneInfo>(key: T) =>
-  (sceneInfo: SceneInfo) =>
-    sceneInfo[key];
+      case 'normal':
+        return sceneInfo;
+    }
+  };
 
 const getElementScrollHeight =
-  (innerHeight: number) => (sceneInfo: SceneInfo) =>
-    pipe(
-      sceneInfo,
-      O.fromPredicate((sceneInfo) => sceneInfo.type === 'sticky'),
-      O.match(
-        () =>
-          pipe(
-            sceneInfo.objs.container,
-            O.match(
-              () => O.none,
-              (element) => O.some(element.offsetHeight),
-            ),
+  (innerHeight: number) => (sceneInfo: SceneInfo) => {
+    switch (sceneInfo.type) {
+      case 'sticky':
+        return O.some(innerHeight * sceneInfo.heightMultiple);
+
+      case 'normal':
+        return pipe(
+          sceneInfo.objs.container,
+          O.match(
+            () => O.none,
+            (element) => O.some(element.offsetHeight),
           ),
-        () => O.some(innerHeight * sceneInfo.heightMultiple),
-      ),
-    );
+        );
+    }
+  };
 
 const setScrollHeight = (innerHeight: number) => (sceneInfo: SceneInfo) =>
   pipe(
     sceneInfo,
     getElementScrollHeight(innerHeight),
-    O.match(() => sceneInfo, setSceneInfoValue('scrollHeight', sceneInfo)),
+    O.match(
+      () => sceneInfo,
+      (scrollHeight) => ({ ...sceneInfo, scrollHeight }),
+    ),
   );
 
 const getCalculatedSceneInfoArray = (
@@ -103,6 +110,7 @@ const getCalculatedSceneInfoArray = (
       () =>
         pipe(
           sceneInfoArray,
+          A.filter((sceneInfo) => sceneInfo.type === 'sticky'),
           A.map(setVideoImages),
           A.mapWithIndex(setSceneInfoElementObject(window.document)),
           A.mapWithIndex(setCanvasElement(window.document)),
@@ -111,4 +119,4 @@ const getCalculatedSceneInfoArray = (
     A.map(setScrollHeight(window.innerHeight)),
   );
 
-export { setSceneInfoValue, getSceneInfoValue, getCalculatedSceneInfoArray };
+export { getCalculatedSceneInfoArray };

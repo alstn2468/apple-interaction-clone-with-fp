@@ -3,7 +3,6 @@ import * as NEA from 'fp-ts/lib/NonEmptyArray';
 import { constUndefined, constVoid, identity, pipe } from 'fp-ts/lib/function';
 
 import { setAttribute } from './dom';
-import { setSceneInfoValue } from './scene';
 import { getCalculatedCSSValue } from './animation';
 
 const getCanvasContext = (canvasElement: HTMLCanvasElement) =>
@@ -26,32 +25,47 @@ const getImagePath = (folder: string) => (num: number) =>
 const createImage = (src: string) =>
   pipe(new Image(), setAttribute('src', src));
 
-const getVideoImages = (sceneInfo: SceneInfo) =>
-  pipe(
-    sceneInfo.canvas,
-    O.fromNullable,
-    O.map((canvas) =>
-      pipe(
-        NEA.range(0, canvas.videoImageCount - 1),
-        NEA.mapWithIndex(getImagePath(canvas.folder)),
-        NEA.map(createImage),
-      ),
-    ),
-  );
+const getVideoImages = (sceneInfo: SceneInfo) => {
+  switch (sceneInfo.type) {
+    case 'sticky':
+      switch (sceneInfo.canvas?.type) {
+        case 'video':
+          return pipe(
+            sceneInfo.canvas,
+            O.fromNullable,
+            O.map((canvas) =>
+              pipe(
+                NEA.range(0, canvas.videoImageCount - 1),
+                NEA.mapWithIndex(getImagePath(canvas.folder)),
+                NEA.map(createImage),
+              ),
+            ),
+          );
+      }
+  }
+  return O.none;
+};
 
-const setVideoImages = (sceneInfo: SceneInfo) =>
-  pipe(
-    sceneInfo,
-    getVideoImages,
-    O.match(() => [] as Array<HTMLImageElement>, identity),
-    (videoImages) =>
-      pipe(
-        sceneInfo.canvas,
-        O.fromNullable,
-        O.match(constUndefined, (canvas) => ({ ...canvas, videoImages })),
-        setSceneInfoValue('canvas', sceneInfo),
-      ),
-  );
+const setVideoImages = (sceneInfo: SceneInfo) => {
+  switch (sceneInfo.type) {
+    case 'sticky':
+      return pipe(
+        sceneInfo,
+        getVideoImages,
+        O.match(() => [] as Array<HTMLImageElement>, identity),
+        (videoImages) =>
+          pipe(
+            sceneInfo.canvas,
+            O.fromNullable,
+            O.match(constUndefined, (canvas) => ({ ...canvas, videoImages })),
+            (canvas) => ({ ...sceneInfo, canvas }),
+          ),
+      );
+
+    case 'normal':
+      return sceneInfo;
+  }
+};
 
 const drawImageOnLoad = (
   videoImages: HTMLImageElement[],
@@ -69,37 +83,47 @@ const playVideo = (
   currentSceneScrollY: number,
   isFirstLoad = false,
 ) => {
-  pipe(
-    sceneInfo.canvas,
-    O.fromNullable,
-    O.map(({ imageSequence, element, videoImages }) =>
+  switch (sceneInfo.type) {
+    case 'sticky':
       pipe(
-        getCalculatedCSSValue(
-          imageSequence,
-          sceneInfo.scrollHeight,
-          currentSceneScrollY,
-        ),
-        O.map(Math.round),
-        O.map((calculatedImageSequence) =>
-          pipe(
-            isFirstLoad,
-            O.fromPredicate(Boolean),
-            O.match(
-              () =>
-                pipe(
-                  element,
-                  drawImageToCanvasContext(
-                    videoImages[calculatedImageSequence],
+        sceneInfo.canvas,
+        O.fromNullable,
+        O.map((canvas) => {
+          switch (canvas.type) {
+            case 'video':
+              pipe(
+                getCalculatedCSSValue(
+                  canvas.imageSequence,
+                  sceneInfo.scrollHeight,
+                  currentSceneScrollY,
+                ),
+                O.map(Math.round),
+                O.map((calculatedImageSequence) =>
+                  pipe(
+                    isFirstLoad,
+                    O.fromPredicate(Boolean),
+                    O.match(
+                      () =>
+                        pipe(
+                          canvas.element,
+                          drawImageToCanvasContext(
+                            canvas.videoImages[calculatedImageSequence],
+                          ),
+                        ),
+                      () =>
+                        drawImageOnLoad(
+                          canvas.videoImages,
+                          calculatedImageSequence,
+                          canvas.element,
+                        ),
+                    ),
                   ),
                 ),
-              () =>
-                drawImageOnLoad(videoImages, calculatedImageSequence, element),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
+              );
+          }
+        }),
+      );
+  }
 };
 
 export { getVideoImages, setVideoImages, playVideo };
