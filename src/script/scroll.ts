@@ -24,7 +24,7 @@ const getNewCurrentScene = (
   let newCurrentScene = currentScene;
 
   const [prevScrollHeight, currentSceneScrollHeight] = getScrollHeightValue(
-    currentScene,
+    newCurrentScene,
     sceneInfoArray,
   );
 
@@ -34,7 +34,7 @@ const getNewCurrentScene = (
 
   if (
     scrollY > prevScrollHeight + currentSceneScrollHeight &&
-    currentScene < sceneInfoArray.length
+    newCurrentScene < sceneInfoArray.length - 1
   ) {
     newCurrentScene += 1;
   }

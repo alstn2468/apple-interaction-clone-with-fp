@@ -110,7 +110,6 @@ const getCalculatedSceneInfoArray = (
       () =>
         pipe(
           sceneInfoArray,
-          A.filter((sceneInfo) => sceneInfo.type === 'sticky'),
           A.map(setVideoImages),
           A.mapWithIndex(setSceneInfoElementObject(window.document)),
           A.mapWithIndex(setCanvasElement(window.document)),

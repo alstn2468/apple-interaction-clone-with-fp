@@ -129,20 +129,24 @@ const playAnimation = (sceneInfo: SceneInfo, currentSceneScrollY: number) =>
     sceneInfo,
     O.fromNullable,
     O.match(constVoid, (sceneInfo) => {
-      if (sceneInfo.type === 'sticky') {
-        pipe(
-          sceneInfo.animations,
-          A.map(
-            getCalculatedAnimationObjects(
-              sceneInfo.scrollHeight,
-              currentSceneScrollY,
+      switch (sceneInfo.type) {
+        case 'sticky':
+          pipe(
+            sceneInfo.animations,
+            A.map(
+              getCalculatedAnimationObjects(
+                sceneInfo.scrollHeight,
+                currentSceneScrollY,
+              ),
             ),
-          ),
-          A.zip(sceneInfo.objs.elements),
-          A.map(([animationObjects, element]) =>
-            pipe(animationObjects, applyAnimationObjectStyleToElement(element)),
-          ),
-        );
+            A.zip(sceneInfo.objs.elements),
+            A.map(([animationObjects, element]) =>
+              pipe(
+                animationObjects,
+                applyAnimationObjectStyleToElement(element),
+              ),
+            ),
+          );
       }
     }),
   );
