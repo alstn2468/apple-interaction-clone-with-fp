@@ -1,27 +1,7 @@
 import * as O from 'fp-ts/lib/Option';
 
-import type { Animation, AnimationValue } from './animation';
-
-type SceneType = 'sticky' | 'normal';
-type SceneInfo = {
-  // 브라우저 높이의 배수
-  heightMultiple: number;
-  scrollHeight: number;
-  type: SceneType;
-  selectors: Array<string>;
-  canvas?: {
-    element: O.Option<HTMLCanvasElement>;
-    folder: string;
-    videoImageCount: number;
-    imageSequence: AnimationValue;
-    videoImages: Array<HTMLImageElement>;
-  };
-  objs: {
-    container: O.Option<HTMLElement>;
-    elements: Array<HTMLElement>;
-  };
-  animations: Array<Animation>;
-};
+import sceneTwoImageOne from '../images/blend-image-1.jpg';
+import sceneTwoImageTwo from '../images/blend-image-2.jpg';
 
 const sceneInfoArray: SceneInfo[] = [
   {
@@ -307,4 +287,4 @@ const sceneInfoArray: SceneInfo[] = [
   },
 ];
 
-export { type SceneInfo, sceneInfoArray };
+export { sceneInfoArray };

@@ -3,26 +3,7 @@ import * as A from 'fp-ts/lib/Array';
 import * as O from 'fp-ts/lib/Option';
 import { pipe, constVoid } from 'fp-ts/lib/function';
 
-import { SceneInfo } from './sceneInfo';
 import { setElementStyle } from './dom';
-
-type CSSValue = number;
-type AnimationValue = {
-  start: CSSValue;
-  end: CSSValue;
-  template?: string;
-};
-type AnimationValueWithTiming = {
-  start: CSSValue;
-  end: CSSValue;
-  template?: string;
-  timing: { start: number; end: number };
-};
-type Animation = {
-  [key in keyof CSS.Properties]?:
-    | { in: AnimationValueWithTiming; out: AnimationValueWithTiming }
-    | AnimationValue;
-};
 
 const getValue = (start: CSSValue, end: CSSValue) => (ratio: number) => {
   if (typeof start === 'number' && typeof end === 'number') {
@@ -71,7 +52,7 @@ const getCalculatedCSSValue = (
 
 type InOutAnimationEntry = [
   string,
-  Exclude<Animation[keyof CSS.Properties], undefined>,
+  Exclude<SceneAnimation[keyof CSS.Properties], undefined>,
 ];
 const getInOrOutAnimation =
   (scrollRatio: number) =>
@@ -107,7 +88,7 @@ const getCalculatedAnimationObject =
 
 const getCalculatedAnimationObjects =
   (currentSceneScrollHeight: number, currentSceneScrollY: number) =>
-  (animation: Animation) => {
+  (animation: SceneAnimation) => {
     const scrollRatio = currentSceneScrollY / currentSceneScrollHeight;
     return pipe(
       Object.entries(animation),
@@ -169,9 +150,4 @@ const playAnimation = (sceneInfo: SceneInfo, currentSceneScrollY: number) =>
     ),
   );
 
-export {
-  type AnimationValue,
-  type Animation,
-  playAnimation,
-  getCalculatedCSSValue,
-};
+export { playAnimation, getCalculatedCSSValue };

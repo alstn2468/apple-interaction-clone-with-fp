@@ -2,7 +2,6 @@ import * as A from 'fp-ts/lib/Array';
 import { pipe } from 'fp-ts/lib/function';
 
 import { setAttributeToBody } from './dom';
-import { type SceneInfo } from './sceneInfo';
 
 const getScrollHeightValue = (
   currentScene: number,

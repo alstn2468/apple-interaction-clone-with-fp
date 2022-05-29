@@ -1,8 +1,7 @@
-import { constUndefined, pipe } from 'fp-ts/lib/function';
 import * as A from 'fp-ts/lib/Array';
 import * as O from 'fp-ts/lib/Option';
+import { constUndefined, pipe } from 'fp-ts/lib/function';
 
-import { type SceneInfo } from './sceneInfo';
 import { setVideoImages } from './video';
 import { getElementById, querySelector, querySelectorAll } from './dom';
 

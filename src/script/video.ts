@@ -1,9 +1,8 @@
-import { constUndefined, constVoid, identity, pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/lib/Option';
 import * as NEA from 'fp-ts/lib/NonEmptyArray';
+import { constUndefined, constVoid, identity, pipe } from 'fp-ts/lib/function';
 
 import { setAttribute } from './dom';
-import { type SceneInfo } from './sceneInfo';
 import { setSceneInfoValue } from './scene';
 import { getCalculatedCSSValue } from './animation';
 

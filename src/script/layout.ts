@@ -3,7 +3,6 @@ import * as O from 'fp-ts/lib/Option';
 import { constVoid, pipe, flow } from 'fp-ts/lib/function';
 
 import { setElementStyle } from './dom';
-import { type SceneInfo } from './sceneInfo';
 
 const setElementScrollHeight = (sceneInfo: SceneInfo) =>
   pipe(
