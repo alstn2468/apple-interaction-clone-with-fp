@@ -70,12 +70,12 @@
   font-size: 1.2rem;
 }
 
-#scroll-section-2 .description-message:nth-child(2) {
+#scroll-section-2 .description-message:nth-child(3) {
   top: 10%;
   left: 40%;
 }
 
-#scroll-section-2 .description-message:nth-child(3) {
+#scroll-section-2 .description-message:nth-child(4) {
   top: 15%;
   left: 45%;
 }
@@ -83,6 +83,7 @@
 .description-message {
   width: 50%;
   font-weight: bold;
+  opacity: 0;
 }
 
 .pin {
@@ -143,12 +144,12 @@
     font-size: 1.5vw;
   }
 
-  #scroll-section-2 .description-message:nth-child(2) {
+  #scroll-section-2 .description-message:nth-child(3) {
     top: 20%;
-    left: 40%;
+    left: 53%;
   }
 
-  #scroll-section-2 .description-message:nth-child(3) {
+  #scroll-section-2 .description-message:nth-child(4) {
     left: 55%;
   }
 

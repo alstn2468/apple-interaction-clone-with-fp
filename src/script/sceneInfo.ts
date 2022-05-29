@@ -152,7 +152,18 @@ const sceneInfoArray: SceneInfo[] = [
     type: 'sticky',
     heightMultiple: 5,
     scrollHeight: 0,
-    selectors: ['.sticky-element', '.pin'],
+    selectors: [
+      '.sticky-element:not(.sticky-element-canvas)',
+      '.pin',
+      '.video-canvas',
+    ],
+    canvas: {
+      element: O.none,
+      videoImageCount: 960,
+      folder: './video/002',
+      imageSequence: { start: 0, end: 959 },
+      videoImages: [],
+    },
     objs: {
       container: O.none,
       elements: [],
@@ -261,6 +272,13 @@ const sceneInfoArray: SceneInfo[] = [
             template: 'scaleY({value})',
             timing: { start: 0.72, end: 0.77 },
           },
+        },
+      },
+      {
+        // #scroll-section-2 .video-canvas:nth-child(1)
+        opacity: {
+          in: { start: 0, end: 1, timing: { start: 0, end: 0.1 } },
+          out: { start: 1, end: 0, timing: { start: 0.95, end: 1 } },
         },
       },
     ],
