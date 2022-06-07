@@ -1,4 +1,5 @@
 import * as O from 'fp-ts/lib/Option';
+import * as A from 'fp-ts/lib/Array';
 import * as NEA from 'fp-ts/lib/NonEmptyArray';
 import { constVoid, identity, pipe } from 'fp-ts/lib/function';
 
@@ -25,7 +26,7 @@ const getImagePath = (folder: string) => (num: number) =>
 const createImage = (src: string) =>
   pipe(new Image(), setAttribute('src', src));
 
-const getVideoImages = (sceneInfo: SceneInfo) => {
+const getImages = (sceneInfo: SceneInfo) => {
   switch (sceneInfo.type) {
     case 'sticky':
       switch (sceneInfo.canvas.type) {
@@ -36,6 +37,8 @@ const getVideoImages = (sceneInfo: SceneInfo) => {
             NEA.map(createImage),
             O.some,
           );
+        case 'image':
+          return pipe(sceneInfo.canvas.imagePaths, A.map(createImage), O.some);
       }
   }
   return O.none;
@@ -46,12 +49,12 @@ const setVideoImages = (sceneInfo: SceneInfo) => {
     case 'sticky':
       return pipe(
         sceneInfo,
-        getVideoImages,
+        getImages,
         O.match(() => [] as Array<HTMLImageElement>, identity),
-        (videoImages) =>
+        (images) =>
           pipe(
             sceneInfo.canvas,
-            (canvas) => ({ ...canvas, videoImages }),
+            (canvas) => ({ ...canvas, images }),
             (canvas) => ({ ...sceneInfo, canvas }),
           ),
       );
@@ -62,17 +65,48 @@ const setVideoImages = (sceneInfo: SceneInfo) => {
 };
 
 const drawImageOnLoad = (
-  videoImages: HTMLImageElement[],
+  images: HTMLImageElement[],
   calculatedImageSequence: number,
   element: O.Option<HTMLCanvasElement>,
 ) =>
-  (videoImages[calculatedImageSequence].onload = () =>
-    pipe(
-      element,
-      drawImageToCanvasContext(videoImages[calculatedImageSequence]),
-    ));
+  (images[calculatedImageSequence].onload = () =>
+    pipe(element, drawImageToCanvasContext(images[calculatedImageSequence])));
 
 const playVideo = (
+  canvas: VideoCanvas,
+  scrollHeight: number,
+  currentSceneScrollY: number,
+  isFirstLoad: boolean,
+) =>
+  pipe(
+    getCalculatedCSSValue(
+      canvas.imageSequence,
+      scrollHeight,
+      currentSceneScrollY,
+    ),
+    O.map(Math.round),
+    O.map((calculatedImageSequence) =>
+      pipe(
+        isFirstLoad,
+        O.fromPredicate(Boolean),
+        O.match(
+          () =>
+            pipe(
+              canvas.element,
+              drawImageToCanvasContext(canvas.images[calculatedImageSequence]),
+            ),
+          () =>
+            drawImageOnLoad(
+              canvas.images,
+              calculatedImageSequence,
+              canvas.element,
+            ),
+        ),
+      ),
+    ),
+  );
+
+const playCanvasAnimation = (
   sceneInfo: SceneInfo,
   currentSceneScrollY: number,
   isFirstLoad = false,
@@ -81,39 +115,22 @@ const playVideo = (
     case 'sticky':
       switch (sceneInfo.canvas.type) {
         case 'video': {
-          const canvas = sceneInfo.canvas;
-          return pipe(
-            getCalculatedCSSValue(
-              canvas.imageSequence,
-              sceneInfo.scrollHeight,
-              currentSceneScrollY,
-            ),
-            O.map(Math.round),
-            O.map((calculatedImageSequence) =>
-              pipe(
-                isFirstLoad,
-                O.fromPredicate(Boolean),
-                O.match(
-                  () =>
-                    pipe(
-                      canvas.element,
-                      drawImageToCanvasContext(
-                        canvas.videoImages[calculatedImageSequence],
-                      ),
-                    ),
-                  () =>
-                    drawImageOnLoad(
-                      canvas.videoImages,
-                      calculatedImageSequence,
-                      canvas.element,
-                    ),
-                ),
-              ),
-            ),
+          return playVideo(
+            sceneInfo.canvas,
+            sceneInfo.scrollHeight,
+            currentSceneScrollY,
+            isFirstLoad,
+          );
+        }
+        case 'image': {
+          return drawImageOnLoad(
+            sceneInfo.canvas.images,
+            0,
+            sceneInfo.canvas.element,
           );
         }
       }
   }
 };
 
-export { getVideoImages, setVideoImages, playVideo };
+export { setVideoImages, playCanvasAnimation };

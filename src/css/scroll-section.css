@@ -104,6 +104,12 @@
   color: rgb(29, 29, 31);
 }
 
+#scroll-section-3 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .canvas-caption {
   max-width: 1000px;
   margin: 0 auto;

@@ -1,8 +1,5 @@
 import * as O from 'fp-ts/lib/Option';
 
-import sceneTwoImageOne from '../images/blend-image-1.jpg';
-import sceneTwoImageTwo from '../images/blend-image-2.jpg';
-
 const sceneInfoArray: SceneInfo[] = [
   {
     // #scroll-section-0
@@ -16,7 +13,7 @@ const sceneInfoArray: SceneInfo[] = [
       videoImageCount: 300,
       folder: './video/001',
       imageSequence: { start: 0, end: 299 },
-      videoImages: [],
+      images: [],
     },
     objs: {
       container: O.none,
@@ -140,7 +137,7 @@ const sceneInfoArray: SceneInfo[] = [
       videoImageCount: 960,
       folder: './video/002',
       imageSequence: { start: 0, end: 959 },
-      videoImages: [],
+      images: [],
     },
     objs: {
       container: O.none,
@@ -273,6 +270,8 @@ const sceneInfoArray: SceneInfo[] = [
     canvas: {
       type: 'image',
       element: O.none,
+      imagePaths: ['./images/blend-image-1.jpg', './images/blend-image-2.jpg'],
+      images: [],
     },
     selectors: ['.canvas-caption'],
     animations: [

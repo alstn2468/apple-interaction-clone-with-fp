@@ -12,7 +12,7 @@ import {
   getNewCurrentSceneOnLoad,
   setShowScrolElementToBody,
 } from './script/scroll';
-import { playVideo } from './script/video';
+import { playCanvasAnimation } from './script/canvas';
 
 const setShowScrolElementToBodyByCurrentScene =
   setShowScrolElementToBody(document);
@@ -22,7 +22,7 @@ const setShowScrolElementToBodyByCurrentScene =
   let currentScene = 0;
   window.addEventListener('resize', () =>
     setLayout(
-      window.innerHeight,
+      window,
       getCalculatedSceneInfoArray(window, calculatedSceneInfoArray),
     ),
   );
@@ -46,9 +46,9 @@ const setShowScrolElementToBodyByCurrentScene =
     const currentSceneInfo = calculatedSceneInfoArray[newCurrentScene];
 
     setShowScrolElementToBodyByCurrentScene(newCurrentScene);
-    setLayout(window.innerHeight, calculatedSceneInfoArray);
+    setLayout(window, calculatedSceneInfoArray);
     playAnimation(currentSceneInfo, currentSceneScrollY);
-    playVideo(currentSceneInfo, currentSceneScrollY, true);
+    playCanvasAnimation(currentSceneInfo, currentSceneScrollY, true);
 
     currentScene = newCurrentScene;
   });
@@ -65,7 +65,7 @@ const setShowScrolElementToBodyByCurrentScene =
     if (currentScene === newCurrentScene) {
       const currentSceneInfo = calculatedSceneInfoArray[newCurrentScene];
       playAnimation(currentSceneInfo, currentSceneScrollY);
-      playVideo(currentSceneInfo, currentSceneScrollY);
+      playCanvasAnimation(currentSceneInfo, currentSceneScrollY);
     }
 
     currentScene = newCurrentScene;

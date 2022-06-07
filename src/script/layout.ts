@@ -22,31 +22,59 @@ const setElementScrollHeight = (sceneInfo: SceneInfo) =>
     () => sceneInfo,
   );
 
-const setCanvasScale = (innerHeight: number) => (sceneInfo: SceneInfo) => {
+const getImageCanvasScaleRatio = (
+  window: Window,
+  canvas: ImageCanvas['element'],
+) =>
+  pipe(
+    canvas,
+    O.match(
+      () => 0,
+      (canvas) => {
+        const widthRatio = window.innerWidth / canvas.width;
+        const heightRatio = window.innerHeight / canvas.height;
+        if (widthRatio <= heightRatio) {
+          return heightRatio;
+        }
+        return widthRatio;
+      },
+    ),
+  );
+
+const setCanvasScale = (window: Window) => (sceneInfo: SceneInfo) => {
   switch (sceneInfo.type) {
     case 'sticky':
-      return pipe(sceneInfo.canvas, ({ element }) =>
-        pipe(
-          element,
-          O.map(
-            setElementStyle(
-              'transform',
-              innerHeight / 1080,
-              'translate3d(-50%, -50%, 0) scale({value})',
-            ),
+      pipe(
+        sceneInfo.canvas,
+        ({ element, type }) => {
+          switch (type) {
+            case 'video':
+              return {
+                ratio: window.innerHeight / 1080,
+                template: 'translate3d(-50%, -50%, 0) scale({value})',
+              };
+            case 'image':
+              return {
+                ratio: getImageCanvasScaleRatio(window, element),
+                template: 'scale({value})',
+              };
+          }
+        },
+        ({ ratio, template }) =>
+          pipe(
+            sceneInfo.canvas.element,
+            O.map(setElementStyle('transform', ratio, template)),
           ),
-        ),
       );
-
-    case 'normal':
-      return sceneInfo;
   }
+
+  return sceneInfo;
 };
 
-const setLayout = (innerHeight: number, sceneInfoArray: SceneInfo[]) =>
+const setLayout = (window: Window, sceneInfoArray: SceneInfo[]) =>
   pipe(
     sceneInfoArray,
-    A.map(flow(setElementScrollHeight, setCanvasScale(innerHeight))),
+    A.map(flow(setElementScrollHeight, setCanvasScale(window))),
   );
 
 export { setLayout };
