@@ -25,11 +25,13 @@ const setSceneInfoElementObject =
                   A.map(querySelectorAll(element)),
                   A.flatten,
                   (elements) => ({
-                    ...sceneInfo.objs,
-                    container: optionElement,
-                    elements,
+                    ...sceneInfo,
+                    objs: {
+                      ...sceneInfo.objs,
+                      container: optionElement,
+                      elements,
+                    },
                   }),
-                  (objs) => ({ ...sceneInfo, objs }),
                 );
 
               case 'normal':
@@ -44,20 +46,19 @@ const setCanvasElement =
   (document: Document) => (index: number, sceneInfo: SceneInfo) => {
     switch (sceneInfo.type) {
       case 'sticky':
-        return pipe(index, getScrollSectionElement(document), (optionElement) =>
-          pipe(
-            optionElement,
-            O.match(
-              () => sceneInfo.canvas,
-              (element) => ({
-                ...sceneInfo.canvas,
-                element: querySelector(element)(
-                  'canvas',
-                ) as O.Option<HTMLCanvasElement>,
-              }),
-            ),
-            (canvas) => ({ ...sceneInfo, canvas }),
+        return pipe(
+          index,
+          getScrollSectionElement(document),
+          O.match(
+            () => sceneInfo.canvas,
+            (element) => ({
+              ...sceneInfo.canvas,
+              element: querySelector(element)(
+                'canvas',
+              ) as O.Option<HTMLCanvasElement>,
+            }),
           ),
+          (canvas) => ({ ...sceneInfo, canvas }),
         );
 
       case 'normal':

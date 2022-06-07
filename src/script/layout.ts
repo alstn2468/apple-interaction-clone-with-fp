@@ -42,30 +42,29 @@ const getImageCanvasScaleRatio = (
   );
 
 const setCanvasScale = (window: Window) => (sceneInfo: SceneInfo) => {
-  switch (sceneInfo.type) {
-    case 'sticky':
-      pipe(
-        sceneInfo.canvas,
-        ({ element, type }) => {
-          switch (type) {
-            case 'video':
-              return {
-                ratio: window.innerHeight / 1080,
-                template: 'translate3d(-50%, -50%, 0) scale({value})',
-              };
-            case 'image':
-              return {
-                ratio: getImageCanvasScaleRatio(window, element),
-                template: 'scale({value})',
-              };
-          }
-        },
-        ({ ratio, template }) =>
-          pipe(
-            sceneInfo.canvas.element,
-            O.map(setElementStyle('transform', ratio, template)),
-          ),
-      );
+  if (sceneInfo.type === 'sticky') {
+    pipe(
+      sceneInfo.canvas,
+      ({ element, type }) => {
+        switch (type) {
+          case 'video':
+            return {
+              ratio: window.innerHeight / 1080,
+              template: 'translate3d(-50%, -50%, 0) scale({value})',
+            };
+          case 'image':
+            return {
+              ratio: getImageCanvasScaleRatio(window, element),
+              template: 'scale({value})',
+            };
+        }
+      },
+      ({ ratio, template }) =>
+        pipe(
+          sceneInfo.canvas.element,
+          O.map(setElementStyle('transform', ratio, template)),
+        ),
+    );
   }
 
   return sceneInfo;

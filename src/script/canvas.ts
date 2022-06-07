@@ -1,7 +1,7 @@
 import * as O from 'fp-ts/lib/Option';
 import * as A from 'fp-ts/lib/Array';
 import * as NEA from 'fp-ts/lib/NonEmptyArray';
-import { constVoid, identity, pipe } from 'fp-ts/lib/function';
+import { constVoid, pipe } from 'fp-ts/lib/function';
 
 import { setAttribute } from './dom';
 import { getCalculatedCSSValue } from './animation';
@@ -27,18 +27,17 @@ const createImage = (src: string) =>
   pipe(new Image(), setAttribute('src', src));
 
 const getImages = (sceneInfo: SceneInfo) => {
-  switch (sceneInfo.type) {
-    case 'sticky':
-      switch (sceneInfo.canvas.type) {
-        case 'video':
-          return pipe(
-            NEA.range(0, sceneInfo.canvas.videoImageCount - 1),
-            NEA.mapWithIndex(getImagePath(sceneInfo.canvas.folder)),
-            NEA.map(createImage),
-          );
-        case 'image':
-          return pipe(sceneInfo.canvas.imagePaths, A.map(createImage));
-      }
+  if (sceneInfo.type === 'sticky') {
+    switch (sceneInfo.canvas.type) {
+      case 'video':
+        return pipe(
+          NEA.range(0, sceneInfo.canvas.videoImageCount - 1),
+          NEA.mapWithIndex(getImagePath(sceneInfo.canvas.folder)),
+          NEA.map(createImage),
+        );
+      case 'image':
+        return pipe(sceneInfo.canvas.imagePaths, A.map(createImage));
+    }
   }
   return [];
 };
@@ -46,13 +45,10 @@ const getImages = (sceneInfo: SceneInfo) => {
 const setVideoImages = (sceneInfo: SceneInfo) => {
   switch (sceneInfo.type) {
     case 'sticky':
-      return pipe(sceneInfo, getImages, (images) =>
-        pipe(
-          sceneInfo.canvas,
-          (canvas) => ({ ...canvas, images }),
-          (canvas) => ({ ...sceneInfo, canvas }),
-        ),
-      );
+      return {
+        ...sceneInfo,
+        canvas: { ...sceneInfo.canvas, images: getImages(sceneInfo) },
+      };
 
     case 'normal':
       return sceneInfo;
@@ -80,7 +76,7 @@ const playVideo = (
       currentSceneScrollY,
     ),
     O.map(Math.round),
-    O.map((calculatedImageSequence) =>
+    O.match(constVoid, (calculatedImageSequence) =>
       pipe(
         isFirstLoad,
         O.fromPredicate(Boolean),
@@ -106,25 +102,24 @@ const playCanvasAnimation = (
   currentSceneScrollY: number,
   isFirstLoad = false,
 ) => {
-  switch (sceneInfo.type) {
-    case 'sticky':
-      switch (sceneInfo.canvas.type) {
-        case 'video': {
-          return playVideo(
-            sceneInfo.canvas,
-            sceneInfo.scrollHeight,
-            currentSceneScrollY,
-            isFirstLoad,
-          );
-        }
-        case 'image': {
-          return drawImageOnLoad(
-            sceneInfo.canvas.images,
-            0,
-            sceneInfo.canvas.element,
-          );
-        }
+  if (sceneInfo.type === 'sticky') {
+    switch (sceneInfo.canvas.type) {
+      case 'video': {
+        return playVideo(
+          sceneInfo.canvas,
+          sceneInfo.scrollHeight,
+          currentSceneScrollY,
+          isFirstLoad,
+        );
       }
+      case 'image': {
+        return drawImageOnLoad(
+          sceneInfo.canvas.images,
+          0,
+          sceneInfo.canvas.element,
+        );
+      }
+    }
   }
 };
 
