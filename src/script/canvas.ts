@@ -35,28 +35,23 @@ const getImages = (sceneInfo: SceneInfo) => {
             NEA.range(0, sceneInfo.canvas.videoImageCount - 1),
             NEA.mapWithIndex(getImagePath(sceneInfo.canvas.folder)),
             NEA.map(createImage),
-            O.some,
           );
         case 'image':
-          return pipe(sceneInfo.canvas.imagePaths, A.map(createImage), O.some);
+          return pipe(sceneInfo.canvas.imagePaths, A.map(createImage));
       }
   }
-  return O.none;
+  return [];
 };
 
 const setVideoImages = (sceneInfo: SceneInfo) => {
   switch (sceneInfo.type) {
     case 'sticky':
-      return pipe(
-        sceneInfo,
-        getImages,
-        O.match(() => [] as Array<HTMLImageElement>, identity),
-        (images) =>
-          pipe(
-            sceneInfo.canvas,
-            (canvas) => ({ ...canvas, images }),
-            (canvas) => ({ ...sceneInfo, canvas }),
-          ),
+      return pipe(sceneInfo, getImages, (images) =>
+        pipe(
+          sceneInfo.canvas,
+          (canvas) => ({ ...canvas, images }),
+          (canvas) => ({ ...sceneInfo, canvas }),
+        ),
       );
 
     case 'normal':
